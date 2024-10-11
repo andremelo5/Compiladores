@@ -22,7 +22,9 @@ identifier              [a-zA-Z]([a-zA-Z_]|[0-9])*|"_"([a-zA-Z_]|[0-9])+
 strlit                  ([^\n\r\\"]|\\n|\\f|\\r|\\\\|\\\"|\\t)*
 
 natural                 ("0"|[1-9][0-9]*|"0"[0-7]+|"0"("x"|"X")[0-9|A-F|a-f]+)
-decimal                 ([0-9]+"."[0-9]+[eE][+-][0-9]+|[1-9]+[eE][+-][0-9]+|"."[0-9]+[eE][+-][0-9]+)
+decimal                 ([0-9]+"."[0-9]*|[0-9]*"."[0-9]+)
+decimal_expo            ([0-9]*"."?[0-9]*[eE][+-]?[0-9]*) 
+
 
 
 semicolon               ";"
@@ -114,7 +116,7 @@ reserved                "++"|"--"|"null"|"break"|"case"|"chan"|"const"|"continue
 
 {reserved}                              {if(flag == 1)printf("RESERVED(%s)\n",yytext);last_token=0;}
 
-{decimal}                               {if(flag == 1)printf("DECIMAL(%s)\n",yytext);last_token=1;}
+{decimal}|{decimal_expo}                               {if(flag == 1)printf("DECIMAL(%s)\n",yytext);last_token=1;}
 {identifier}                            {if(flag == 1)printf("IDENTIFIER(%s)\n",yytext);last_token=1;}
 {natural}                               {if(flag == 1)printf("NATURAL(%s)\n",yytext);last_token=1;}
 
@@ -142,10 +144,10 @@ reserved                "++"|"--"|"null"|"break"|"case"|"chan"|"const"|"continue
 <COMMENT_ASTERISCO>"*/"                 {BEGIN(INITIAL);}
 <COMMENT_ASTERISCO>{newline}            {coluna=1,linha++;}
 <COMMENT_ASTERISCO>.                    {}
-<COMMENT_ASTERISCO><<EOF>>              {printf("Line %d, column %d: unterminated comment\n",linha_coluna[0],linha_coluna[1]);BEGIN(INITIAL);}
+<COMMENT_ASTERISCO><<EOF>>              {printf("Line %d, column %d: unterminated comment\n",linha_coluna[0],linha_coluna[1]);BEGIN(INITIAL);last_token=0;}
 
 "//"                                    {BEGIN(COMMENT_BARRAS);}
-<COMMENT_BARRAS>{newline}               {BEGIN(INITIAL);coluna=1,linha++;if(last_token==1)printf("SEMICOLON\n");}
+<COMMENT_BARRAS>{newline}               {BEGIN(INITIAL);coluna=1,linha++;if(last_token==1)printf("SEMICOLON\n");last_token=0;}
 <COMMENT_BARRAS>.                       {}
 
 .                                       { printf("Line %d, column %d: illegal character (%s)\n", linha,coluna-1,yytext); } 
