@@ -119,7 +119,7 @@ reserved                "++"|"--"|"null"|"break"|"case"|"chan"|"const"|"continue
 {natural}                               {if(flag == 1)printf("NATURAL(%s)\n",yytext);last_token=1;}
 
 
-0[0-9]+                                 { printf("Line %d, column %d: invalid octal constant (%s)\n", linha,coluna - (int)strlen(yytext),yytext); } //o erro e para ser dado no primeiro digito
+0[0-9]+                                 {printf("Line %d, column %d: invalid octal constant (%s)\n", linha,coluna - (int)strlen(yytext),yytext); } //o erro e para ser dado no primeiro digito
 
 
 
@@ -145,10 +145,10 @@ reserved                "++"|"--"|"null"|"break"|"case"|"chan"|"const"|"continue
 <COMMENT_ASTERISCO><<EOF>>              {printf("Line %d, column %d: unterminated comment\n",linha_coluna[0],linha_coluna[1]);BEGIN(INITIAL);}
 
 "//"                                    {BEGIN(COMMENT_BARRAS);}
-<COMMENT_BARRAS>{newline}               {BEGIN(INITIAL);coluna=1,linha++;if(last_token==1)printf("SEMICOLON\n");}
+<COMMENT_BARRAS>{newline}               {coluna=1,linha++;if(last_token==1)printf("SEMICOLON\n");last_token=0; BEGIN(INITIAL);}
 <COMMENT_BARRAS>.                       {}
 
-.                                       { printf("Line %d, column %d: illegal character (%s)\n", linha,coluna-1,yytext); } 
+.                                       {printf("Line %d, column %d: illegal character (%s)\n", linha,coluna-1,yytext); } 
 <<EOF>>                                 {linha++;coluna = 1;if(flag==1 && last_token==1)printf("SEMICOLON\n");last_token=0;return 1;}
 
 %%
