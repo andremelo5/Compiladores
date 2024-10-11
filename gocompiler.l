@@ -131,10 +131,10 @@ reserved                "++"|"--"|"null"|"break"|"case"|"chan"|"const"|"continue
 
 \"                                      {BEGIN(STRLIT); flag_string=1;strlit = yytext; linha_coluna[0]=linha; linha_coluna[1]=coluna-1;}
 <STRLIT>{strlit}                        {}
-<STRLIT>\\.                             {printf("Line %d, col %d: invalid escape sequence (%s)\n",linha,coluna-1,yytext);flag_string=0;}
-<STRLIT>{newline}                       {linha++; coluna= 1; printf("Line %d, col %d: unterminated string literal\n",linha_coluna[0],linha_coluna[1]);BEGIN(INITIAL);}
+<STRLIT>\\.                             {printf("Line %d, column %d: invalid escape sequence (%s)\n",linha,coluna-1,yytext);flag_string=0;}
+<STRLIT>{newline}                       {linha++; coluna= 1; printf("Line %d, column %d: unterminated string literal\n",linha_coluna[0],linha_coluna[1]);BEGIN(INITIAL);}
 <STRLIT>\"                              {if(flag==1&&flag_string==1)printf("STRLIT(%s)\n",strlit);BEGIN(INITIAL);last_token=1;}
-<STRLIT><<EOF>>                         {printf("Line %d, col %d: unterminated string literal\n",linha_coluna[0],linha_coluna[1]); coluna+=yyleng; BEGIN(INITIAL);}
+<STRLIT><<EOF>>                         {printf("Line %d, column %d: unterminated string literal\n",linha_coluna[0],linha_coluna[1]); coluna+=yyleng; BEGIN(INITIAL);}
 
 
 
@@ -145,7 +145,7 @@ reserved                "++"|"--"|"null"|"break"|"case"|"chan"|"const"|"continue
 <COMMENT_ASTERISCO><<EOF>>              {printf("Line %d, column %d: unterminated comment\n",linha_coluna[0],linha_coluna[1]);BEGIN(INITIAL);}
 
 "//"                                    {BEGIN(COMMENT_BARRAS);}
-<COMMENT_BARRAS>{newline}               {BEGIN(INITIAL);coluna=1,linha++;}
+<COMMENT_BARRAS>{newline}               {BEGIN(INITIAL);coluna=1,linha++;if(last_token==1)printf("SEMICOLON\n");}
 <COMMENT_BARRAS>.                       {}
 
 .                                       { printf("Line %d, column %d: illegal character (%s)\n", linha,coluna-1,yytext); } 
