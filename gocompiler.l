@@ -119,7 +119,7 @@ reserved                "++"|"--"|"null"|"break"|"case"|"chan"|"const"|"continue
 {natural}                               {if(flag == 1)printf("NATURAL(%s)\n",yytext);last_token=1;}
 
 
-0[0-9]+                                 { printf("Line %d, column %d: octal (%s)\n", linha,coluna-1,yytext); } 
+0[0-9]+                                 { printf("Line %d, column %d: invalid octal constant (%s)\n", linha,coluna - (int)strlen(yytext),yytext); } //o erro e para ser dado no primeiro digito
 
 
 
@@ -131,9 +131,9 @@ reserved                "++"|"--"|"null"|"break"|"case"|"chan"|"const"|"continue
 
 \"                                      {BEGIN(STRLIT); flag_string=1;strlit = yytext; linha_coluna[0]=linha; linha_coluna[1]=coluna-1;}
 <STRLIT>{strlit}                        {}
-<STRLIT>\\.                             {printf("Line %d, column %d: invalid escape sequence (%s)\n",linha,coluna-1,yytext);flag_string=0;}
+<STRLIT>\\.                             {printf("Line %d, column %d: invalid escape sequence (%s)\n",linha,coluna-2,yytext);flag_string=0;}
 <STRLIT>{newline}                       {linha++; coluna= 1; printf("Line %d, column %d: unterminated string literal\n",linha_coluna[0],linha_coluna[1]);BEGIN(INITIAL);}
-<STRLIT>\"                              {if(flag==1&&flag_string==1)printf("STRLIT(%s)\n",strlit);BEGIN(INITIAL);last_token=1;}
+<STRLIT>\"                              {if(flag==1&&flag_string==1){printf("STRLIT(%s)\n",strlit);last_token=1;};BEGIN(INITIAL);}
 <STRLIT><<EOF>>                         {printf("Line %d, column %d: unterminated string literal\n",linha_coluna[0],linha_coluna[1]); coluna+=yyleng; BEGIN(INITIAL);}
 
 
