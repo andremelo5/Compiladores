@@ -12,6 +12,19 @@
     int last_token=0; //flag para as semicolon
     #define YY_USER_ACTION {coluna+=yyleng;} 
 
+    char str_buffer[4096];
+    int str_buffer_index = 0;
+
+    void add_str_buffer(char *add, int length) {
+        strncpy(&str_buffer[str_buffer_index], add, length);
+        str_buffer_index += length;
+    }
+
+    void reset_str_buffer() {
+        str_buffer_index = 0;
+        str_buffer[0] = '\0';
+    }
+
 %}
 %X COMMENT_BARRAS STRLIT COMMENT_ASTERISCO
 
@@ -116,9 +129,9 @@ reserved                "++"|"--"|"null"|"break"|"case"|"chan"|"const"|"continue
 
 {reserved}                              {if(flag == 1)printf("RESERVED(%s)\n",yytext);last_token=0;}
 
-{decimal}|{decimal_expo}                {if(flag == 1)printf("DECIMAL(%s)\n",yytext);last_token=1;}
 {identifier}                            {if(flag == 1)printf("IDENTIFIER(%s)\n",yytext);last_token=1;}
 {natural}                               {if(flag == 1)printf("NATURAL(%s)\n",yytext);last_token=1;}
+{decimal}|{decimal_expo}                {if(flag == 1)printf("DECIMAL(%s)\n",yytext);last_token=1;}
 
 
 0[0-9]+                                 {printf("Line %d, column %d: invalid octal constant (%s)\n", linha,coluna - yyleng,yytext); } //o erro e para ser dado no primeiro digito
@@ -131,12 +144,12 @@ reserved                "++"|"--"|"null"|"break"|"case"|"chan"|"const"|"continue
 
 
 
-\"                                      {BEGIN(STRLIT); flag_string=1;strlit = yytext; linha_coluna[0]=linha; linha_coluna[1]=coluna-1;}
-<STRLIT>{newline}                       {coluna= 1;linha++; printf("Line %d, column %d: unterminated string literal\n",linha_coluna[0],linha_coluna[1]);last_token=0;BEGIN(INITIAL);}
-<STRLIT>{strlit}                        {}
-<STRLIT>\\.                             {printf("Line %d, column %d: invalid escape sequence (%s)\n",linha,coluna-2,yytext);flag_string=0;}
-<STRLIT>\"                              {if(flag==1&&flag_string==1){printf("STRLIT(%s)\n",strlit);last_token=1;};BEGIN(INITIAL);}
-<STRLIT><<EOF>>                         {printf("Line %d, column %d: unterminated string literal\n",linha_coluna[0],linha_coluna[1]); coluna+=yyleng; BEGIN(INITIAL);}
+\"                                      {BEGIN(STRLIT); flag_string=1;reset_str_buffer();add_str_buffer(yytext, yyleng); linha_coluna[0]=linha; linha_coluna[1]=coluna-1;}
+<STRLIT>{strlit}                        {add_str_buffer(yytext, yyleng);}
+<STRLIT>\\(.?)                          {printf("Line %d, column %d: invalid escape sequence (%s)\n",linha,coluna-(int)strlen(yytext),yytext);flag_string=0;}
+<STRLIT>{newline}                       {linha++; coluna= 1; printf("Line %d, column %d: unterminated string literal\n",linha_coluna[0],linha_coluna[1]);reset_str_buffer();BEGIN(INITIAL);}
+<STRLIT>\"                              {add_str_buffer(yytext, yyleng);str_buffer[str_buffer_index] = '\0';if(flag==1&&flag_string==1){printf("STRLIT(%s)\n",str_buffer);last_token=1;};reset_str_buffer();BEGIN(INITIAL);}
+<STRLIT><<EOF>>                         {printf("Line %d, column %d: unterminated string literal\n",linha_coluna[0],linha_coluna[1]); coluna+=yyleng;reset_str_buffer(); BEGIN(INITIAL);}
 
 
 
