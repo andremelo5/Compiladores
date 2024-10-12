@@ -7,7 +7,7 @@
     int coluna = 1;
     int linha_coluna[2]; 
     int flag = 0; //0 - imprime so erros , 1 - imprimi tudo (so acontece se for corrido com a flag -l)
-    int flag_string=0; //para quando da erro a meio na string nao a imprimir
+    int flag_string = 0; //para quando da erro a meio na string nao a imprimir
     char * strlit;
     int last_token=0; //flag para as semicolon
     #define YY_USER_ACTION {coluna+=yyleng;} 
@@ -16,7 +16,7 @@
 %X COMMENT_BARRAS STRLIT COMMENT_ASTERISCO
 
 
-newline                 [\n|\r|\r\n]
+newline                 \n|\r|\r\n
 
 identifier              [a-zA-Z]([a-zA-Z_]|[0-9])*|"_"([a-zA-Z_]|[0-9])+
 strlit                  ([^\n\r\\"]|\\n|\\f|\\r|\\\\|\\\"|\\t)*
@@ -116,25 +116,25 @@ reserved                "++"|"--"|"null"|"break"|"case"|"chan"|"const"|"continue
 
 {reserved}                              {if(flag == 1)printf("RESERVED(%s)\n",yytext);last_token=0;}
 
-{decimal}|{decimal_expo}                               {if(flag == 1)printf("DECIMAL(%s)\n",yytext);last_token=1;}
+{decimal}|{decimal_expo}                {if(flag == 1)printf("DECIMAL(%s)\n",yytext);last_token=1;}
 {identifier}                            {if(flag == 1)printf("IDENTIFIER(%s)\n",yytext);last_token=1;}
 {natural}                               {if(flag == 1)printf("NATURAL(%s)\n",yytext);last_token=1;}
 
 
-0[0-9]+                                 {printf("Line %d, column %d: invalid octal constant (%s)\n", linha,coluna - (int)strlen(yytext),yytext); } //o erro e para ser dado no primeiro digito
+0[0-9]+                                 {printf("Line %d, column %d: invalid octal constant (%s)\n", linha,coluna - yyleng,yytext); } //o erro e para ser dado no primeiro digito
 
 
 
 "\f"|"\t"|" "                           {}
-\n|\r|\r\n                              {linha++;coluna = 1;if(flag==1 && last_token==1)printf("SEMICOLON\n");last_token=0;}
+{newline}                               {linha++;coluna = 1;if(flag==1 && last_token==1)printf("SEMICOLON\n");last_token=0;}
 
 
 
 
 \"                                      {BEGIN(STRLIT); flag_string=1;strlit = yytext; linha_coluna[0]=linha; linha_coluna[1]=coluna-1;}
+<STRLIT>{newline}                       {coluna= 1;linha++; printf("Line %d, column %d: unterminated string literal\n",linha_coluna[0],linha_coluna[1]);last_token=0;BEGIN(INITIAL);}
 <STRLIT>{strlit}                        {}
 <STRLIT>\\.                             {printf("Line %d, column %d: invalid escape sequence (%s)\n",linha,coluna-2,yytext);flag_string=0;}
-<STRLIT>{newline}                       {linha++; coluna= 1; printf("Line %d, column %d: unterminated string literal\n",linha_coluna[0],linha_coluna[1]);BEGIN(INITIAL);}
 <STRLIT>\"                              {if(flag==1&&flag_string==1){printf("STRLIT(%s)\n",strlit);last_token=1;};BEGIN(INITIAL);}
 <STRLIT><<EOF>>                         {printf("Line %d, column %d: unterminated string literal\n",linha_coluna[0],linha_coluna[1]); coluna+=yyleng; BEGIN(INITIAL);}
 
@@ -142,16 +142,17 @@ reserved                "++"|"--"|"null"|"break"|"case"|"chan"|"const"|"continue
 
 "/*"                                    {BEGIN(COMMENT_ASTERISCO);linha_coluna[0]=linha;linha_coluna[1]=coluna-2;}
 <COMMENT_ASTERISCO>"*/"                 {BEGIN(INITIAL);}
-<COMMENT_ASTERISCO>{newline}            {coluna=1,linha++;}
-<COMMENT_ASTERISCO>.                    {}
+<COMMENT_ASTERISCO>{newline}            {coluna=1;linha++;}
 <COMMENT_ASTERISCO><<EOF>>              {printf("Line %d, column %d: unterminated comment\n",linha_coluna[0],linha_coluna[1]);BEGIN(INITIAL);last_token=0;}
+<COMMENT_ASTERISCO>.                    {;}
 
 "//"                                    {BEGIN(COMMENT_BARRAS);}
-<COMMENT_BARRAS>{newline}               {BEGIN(INITIAL);coluna=1,linha++;if(last_token==1)printf("SEMICOLON\n");last_token=0;}
-<COMMENT_BARRAS>.                       {}
+<COMMENT_BARRAS>{newline}               {BEGIN(INITIAL);coluna=1; linha++;if(last_token==1)printf("SEMICOLON\n");last_token=0;}
+<COMMENT_BARRAS>.                       {;}
 
-.                                       {printf("Line %d, column %d: illegal character (%s)\n", linha,coluna-1,yytext); } 
-<<EOF>>                                 {linha++;coluna = 1;if(flag==1 && last_token==1)printf("SEMICOLON\n");last_token=0;return 1;}
+<<EOF>>                                 {if(flag==1 && last_token==1)printf("SEMICOLON\n");last_token=0;return 1;}
+.                                       { printf("Line %d, column %d: illegal character (%s)\n", linha, coluna - yyleng, yytext);} 
+
 
 %%
 
@@ -168,6 +169,7 @@ int main(int argc, char *argv[])
     yylex();
     return 0;
 }
+
 int yywrap() {  /* called on EOF, return 1 to terminate */
     return 1;
 }
