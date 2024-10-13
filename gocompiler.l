@@ -3,14 +3,16 @@
     #include <stdlib.h>
     #include <string.h>
 
+    #define YY_USER_ACTION {coluna+=yyleng;} 
+
     int linha = 1;
     int coluna = 1;
     int linha_coluna[2]; 
+
     int flag = 0; //0 - imprime so erros , 1 - imprimi tudo (so acontece se for corrido com a flag -l)
-    int flag_string = 0; //para quando da erro a meio na string nao a imprimir
-    char * strlit;
+    int flag_string=0; //para quando da erro a meio na string nao a imprimir
     int last_token=0; //flag para as semicolon
-    #define YY_USER_ACTION {coluna+=yyleng;} 
+    
 
     char str_buffer[4096];
     int str_buffer_index = 0;
@@ -30,13 +32,26 @@
 
 
 newline                 \n|\r|\r\n
+ignore                  "\f"|"\t"|" "
 
-identifier              [a-zA-Z]([a-zA-Z_]|[0-9])*|"_"([a-zA-Z_]|[0-9])+
-strlit                  ([^\n\r\\"]|\\n|\\f|\\r|\\\\|\\\"|\\t)*
+letra                   [a-z]|[A-Z]|"_"
+digito                  [0-9]
 
-natural                 ("0"|[1-9][0-9]*|"0"[0-7]+|"0"("x"|"X")[0-9|A-F|a-f]+)
-decimal                 ([0-9]+"."[0-9]*|[0-9]*"."[0-9]+)
-decimal_expo            ([0-9]*"."?[0-9]*[eE][+-]?[0-9]*) 
+octal_prefixo           "0"
+octal                   {octal_prefixo}[0-7]+
+invalid_octal           {octal_prefixo}[0-9]+
+
+hex_prefixo             "0x"|"0X"
+hex                     {hex_prefixo}[0-9a-fA-F]+
+
+identifier              {letra}({digito}|{letra})*
+natural                 {digito}+
+
+expoente                [eE][+-]?{digito}+
+decimal                 ({digito}+"."{digito}*{expoente}?)|("."{digito}+{expoente}?)|({digito}+{expoente})
+
+escape_seq              \\\\|\\n|\\f|\\r|\\t|\\\"
+
 
 
 
@@ -78,12 +93,33 @@ print                   "fmt.Println"
 parseint                "strconv.Atoi"
 func                    "func"
 cmdargs                 "os.Args"
-reserved                "++"|"--"|"null"|"break"|"case"|"chan"|"const"|"continue"|"default"|"defer"|"fallthrough"|"go"|"goto"|"import"|"interface"|"map"|"range"|"select"|"struct"|"switch"|"type"
+reserved                "++"|"--"|"break"|"case"|"chan"|"const"|"continue"|"default"|"defer"|"fallthrough"|"go"|"goto"|"import"|"interface"|"map"|"range"|"select"|"struct"|"switch"|"type"
 
 
 
 
 %%
+
+"//"                                    {BEGIN(COMMENT_BARRAS);}
+<COMMENT_BARRAS>{newline}               {BEGIN(INITIAL);coluna=1,linha++;if(last_token==1)printf("SEMICOLON\n");last_token=0;}
+<COMMENT_BARRAS>.                       {}
+
+
+"/*"                                    {BEGIN(COMMENT_ASTERISCO);linha_coluna[0]=linha;linha_coluna[1]=coluna-yyleng;}
+<COMMENT_ASTERISCO>"*/"                 {BEGIN(INITIAL);}
+<COMMENT_ASTERISCO>.                    {}
+<COMMENT_ASTERISCO>{newline}            {coluna=1,linha++;}
+<COMMENT_ASTERISCO><<EOF>>              {printf("Line %d, column %d: unterminated comment\n",linha_coluna[0],linha_coluna[1]);last_token=0;return 1;}
+
+
+\"                                      {BEGIN(STRLIT); flag_string=1;reset_str_buffer();add_str_buffer(yytext, yyleng); linha_coluna[0]=linha; linha_coluna[1]=coluna-yyleng;}
+<STRLIT>\"                              {add_str_buffer(yytext, yyleng);str_buffer[str_buffer_index] = '\0';if(flag==1&&flag_string==1){printf("STRLIT(%s)\n",str_buffer);last_token=1;};reset_str_buffer();BEGIN(INITIAL);}
+<STRLIT>{escape_seq}                    {add_str_buffer(yytext, yyleng);}
+<STRLIT>((\\.)|(\\))                    {printf("Line %d, column %d: invalid escape sequence (%s)\n",linha,coluna-yyleng,yytext);flag_string=0;str_buffer_index+=yyleng;}
+<STRLIT>{newline}                       {linha++; coluna= 1; printf("Line %d, column %d: unterminated string literal\n",linha_coluna[0],linha_coluna[1]);reset_str_buffer();BEGIN(INITIAL);}
+<STRLIT>.                               {add_str_buffer(yytext, yyleng);}
+<STRLIT><<EOF>>                         {printf("Line %d, column %d: unterminated string literal\n",linha_coluna[0],linha_coluna[1]);reset_str_buffer(); BEGIN(INITIAL);return 1;}
+
 
 
 
@@ -98,7 +134,7 @@ reserved                "++"|"--"|"null"|"break"|"case"|"chan"|"const"|"continue
 {eq}                                    {if(flag == 1)printf("EQ\n");last_token=0;}
 {ge}                                    {if(flag == 1)printf("GE\n");last_token=0;}
 {gt}                                    {if(flag == 1)printf("GT\n");last_token=0;}
-{lbrace}                                {if(flag == 1)printf("LBRACE\n");last_token=0;} //aqui acho q temos de mander o last_token=1 por causa dos comentarios
+{lbrace}                                {if(flag == 1)printf("LBRACE\n");last_token=0;} 
 {le}                                    {if(flag == 1)printf("LE\n");last_token=0;}
 {lpar}                                  {if(flag == 1)printf("LPAR\n");last_token=0;}
 {lsq}                                   {if(flag == 1)printf("LSQ\n");last_token=0;}
@@ -125,47 +161,24 @@ reserved                "++"|"--"|"null"|"break"|"case"|"chan"|"const"|"continue
 {parseint}                              {if(flag == 1)printf("PARSEINT\n");last_token=0;}
 {func}                                  {if(flag == 1)printf("FUNC\n");last_token=0;}
 {cmdargs}                               {if(flag == 1)printf("CMDARGS\n");last_token=0;}
-
+{ignore}                                {}
 
 {reserved}                              {if(flag == 1)printf("RESERVED(%s)\n",yytext);last_token=0;}
 
+
 {identifier}                            {if(flag == 1)printf("IDENTIFIER(%s)\n",yytext);last_token=1;}
+
+{octal}                                 {if(flag == 1)printf("NATURAL(%s)\n",yytext);last_token=1;}
+{invalid_octal}                         { printf("Line %d, column %d: invalid octal constant (%s)\n", linha,coluna - yyleng,yytext); } //o erro e para ser dado no primeiro digito
 {natural}                               {if(flag == 1)printf("NATURAL(%s)\n",yytext);last_token=1;}
-{decimal}|{decimal_expo}                {if(flag == 1)printf("DECIMAL(%s)\n",yytext);last_token=1;}
+{hex}                                   {if(flag == 1)printf("NATURAL(%s)\n",yytext);last_token=1;}
+{decimal}                               {if(flag == 1)printf("DECIMAL(%s)\n",yytext);last_token=1;}
 
-
-0[0-9]+                                 {printf("Line %d, column %d: invalid octal constant (%s)\n", linha,coluna - yyleng,yytext); } //o erro e para ser dado no primeiro digito
-
-
-
-"\f"|"\t"|" "                           {}
 {newline}                               {linha++;coluna = 1;if(flag==1 && last_token==1)printf("SEMICOLON\n");last_token=0;}
 
 
-
-
-\"                                      {BEGIN(STRLIT); flag_string=1;reset_str_buffer();add_str_buffer(yytext, yyleng); linha_coluna[0]=linha; linha_coluna[1]=coluna-1;}
-<STRLIT>{strlit}                        {add_str_buffer(yytext, yyleng);}
-<STRLIT>\\(.?)                          {printf("Line %d, column %d: invalid escape sequence (%s)\n",linha,coluna-(int)strlen(yytext),yytext);flag_string=0;}
-<STRLIT>{newline}                       {linha++; coluna= 1; printf("Line %d, column %d: unterminated string literal\n",linha_coluna[0],linha_coluna[1]);reset_str_buffer();BEGIN(INITIAL);}
-<STRLIT>\"                              {add_str_buffer(yytext, yyleng);str_buffer[str_buffer_index] = '\0';if(flag==1&&flag_string==1){printf("STRLIT(%s)\n",str_buffer);last_token=1;};reset_str_buffer();BEGIN(INITIAL);}
-<STRLIT><<EOF>>                         {printf("Line %d, column %d: unterminated string literal\n",linha_coluna[0],linha_coluna[1]); coluna+=yyleng;reset_str_buffer(); BEGIN(INITIAL);}
-
-
-
-"/*"                                    {BEGIN(COMMENT_ASTERISCO);linha_coluna[0]=linha;linha_coluna[1]=coluna-2;}
-<COMMENT_ASTERISCO>"*/"                 {BEGIN(INITIAL);}
-<COMMENT_ASTERISCO>{newline}            {coluna=1;linha++;}
-<COMMENT_ASTERISCO><<EOF>>              {printf("Line %d, column %d: unterminated comment\n",linha_coluna[0],linha_coluna[1]);BEGIN(INITIAL);last_token=0;}
-<COMMENT_ASTERISCO>.                    {;}
-
-"//"                                    {BEGIN(COMMENT_BARRAS);}
-<COMMENT_BARRAS>{newline}               {BEGIN(INITIAL);coluna=1; linha++;if(last_token==1)printf("SEMICOLON\n");last_token=0;}
-<COMMENT_BARRAS>.                       {;}
-
-<<EOF>>                                 {if(flag==1 && last_token==1)printf("SEMICOLON\n");last_token=0;return 1;}
-.                                       { printf("Line %d, column %d: illegal character (%s)\n", linha, coluna - yyleng, yytext);} 
-
+.                                       { printf("Line %d, column %d: illegal character (%s)\n", linha,coluna-yyleng,yytext); } 
+<<EOF>>                                 {if(flag==1 && last_token==1)printf("SEMICOLON\n");return 1;}
 
 %%
 
@@ -182,7 +195,6 @@ int main(int argc, char *argv[])
     yylex();
     return 0;
 }
-
 int yywrap() {  /* called on EOF, return 1 to terminate */
     return 1;
 }
