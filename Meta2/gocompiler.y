@@ -1,7 +1,6 @@
 /* START definitions section -- C code delimited by %{ ... %} and token declarations */
 
 %{
-
 #include "ast.h"
 
 int yylex(void);
