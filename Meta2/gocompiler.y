@@ -41,7 +41,6 @@ struct node *program;
 %%
 
 program: PACKAGE IDENTIFIER SEMICOLON declarations              {$$=program=newnode(Program,NULL);
-                                                                    if($2!=NULL){addchild($$,newnode(Identifier,$2));} //perguntar pq e que o identifier pode ser null
                                                                     addchild($$,$4);}
     ;
 

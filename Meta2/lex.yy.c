@@ -658,7 +658,7 @@ char *yytext;
 
 #define INITIAL 0
 #define COMMENT_BARRAS 1
-#define STRLIT 2
+#define STRLIT2 2
 #define COMMENT_ASTERISCO 3
 
 #ifndef YY_NO_UNISTD_H
@@ -978,12 +978,12 @@ case YY_STATE_EOF(COMMENT_ASTERISCO):
 case 8:
 YY_RULE_SETUP
 #line 127 "gocompiler.l"
-{BEGIN(STRLIT); flag_string=1;reset_str_buffer();add_str_buffer(yytext, yyleng); linha_coluna[0]=linha; linha_coluna[1]=coluna-yyleng;}
+{BEGIN(STRLIT2); flag_string=1;reset_str_buffer();add_str_buffer(yytext, yyleng); linha_coluna[0]=linha; linha_coluna[1]=coluna-yyleng;}
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
 #line 128 "gocompiler.l"
-{add_str_buffer(yytext, yyleng);str_buffer[str_buffer_index] = '\0';if(flag==1&&flag_string==1){printf("STRLIT(%s)\n",str_buffer);last_token=1;};reset_str_buffer();BEGIN(INITIAL);}
+{add_str_buffer(yytext, yyleng);BEGIN(INITIAL);if(flag_string==1){if(flag==1){printf("STRLIT(%s)\n",str_buffer);}last_token=1;yylval.lexeme = strdup(str_buffer);return STRLIT;}}
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
@@ -1006,9 +1006,9 @@ YY_RULE_SETUP
 #line 132 "gocompiler.l"
 {add_str_buffer(yytext, yyleng);}
 	YY_BREAK
-case YY_STATE_EOF(STRLIT):
+case YY_STATE_EOF(STRLIT2):
 #line 133 "gocompiler.l"
-{printf("Line %d, column %d: unterminated string literal\n",linha_coluna[0],linha_coluna[1]);reset_str_buffer(); BEGIN(INITIAL);return 1;}
+{printf("Line %d, column %d: unterminated string literal\n",linha_coluna[0],linha_coluna[1]);reset_str_buffer(); BEGIN(INITIAL);return 0;}
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
@@ -1244,16 +1244,24 @@ case 60:
 /* rule 60 can match eol */
 YY_RULE_SETUP
 #line 189 "gocompiler.l"
-{linha++;coluna = 1;if(flag==1 && last_token==1)printf("SEMICOLON\n");last_token=0;}
+{linha++;coluna = 1;
+                                            if(last_token==1){
+                                                if(flag==1){
+                                                    printf("SEMICOLON\n"); 
+                                                }
+                                                last_token=0;
+                                                return SEMICOLON;
+                                            }
+                                        }
 	YY_BREAK
 case 61:
 YY_RULE_SETUP
-#line 193 "gocompiler.l"
+#line 201 "gocompiler.l"
 { yyerror("unrecognized character"); }
 	YY_BREAK
 case YY_STATE_EOF(INITIAL):
 case YY_STATE_EOF(COMMENT_BARRAS):
-#line 195 "gocompiler.l"
+#line 203 "gocompiler.l"
 {
                                             if(flag==1 && last_token==1){
                                                 printf("SEMICOLON\n");
@@ -1267,10 +1275,10 @@ case YY_STATE_EOF(COMMENT_BARRAS):
 	YY_BREAK
 case 62:
 YY_RULE_SETUP
-#line 206 "gocompiler.l"
+#line 214 "gocompiler.l"
 ECHO;
 	YY_BREAK
-#line 1273 "lex.yy.c"
+#line 1281 "lex.yy.c"
 
 	case YY_END_OF_BUFFER:
 		{
@@ -2273,7 +2281,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 206 "gocompiler.l"
+#line 214 "gocompiler.l"
 
 
 
@@ -2282,7 +2290,7 @@ extern int yylex();
 int main(int argc, char *argv[]){
     if (argc > 1 && strcmp(argv[1],"-l") == 0) {
             flag = 1;
-            yylex();
+            while(yylex()); //sem o while so imprime o primeiro e acaba o progrma
             return 0;
     }
     else if(argc >= 2 && strcmp(argv[1], "-t") == 0 && errors == 0) {  
