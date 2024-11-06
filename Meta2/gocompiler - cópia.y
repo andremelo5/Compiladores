@@ -1,7 +1,6 @@
 /* START definitions section -- C code delimited by %{ ... %} and token declarations */
 
 %{
-
 #include "ast.h"
 
 int yylex(void);
@@ -16,7 +15,7 @@ struct node *program;
 
 
 %token<lexeme> IDENTIFIER NATURAL DECIMAL STRLIT
-%type<node> program  declarations vardeclaration  varspec varspec2 type funcdeclaration funcheader funcparams funcheader2 parameters parameters2 funcbody  varsandstatements  statement statement2 statement3 statement4 printstatement parseargs funcinvocation funcinvocation2 expr
+%type<node> program  declarations vardeclaration  varspec varspec2 type funcdeclaration funcheader funcparams funcheader2 parameters parameters2 funcbody  varsandstatements  statement statement2  parseargs funcinvocation funcinvocation2 expr
 
 
 %left COMMA
@@ -42,7 +41,6 @@ struct node *program;
 %%
 
 program: PACKAGE IDENTIFIER SEMICOLON declarations              {$$=program=newnode(Program,NULL);
-                                                                    if($2!=NULL){addchild($$,newnode(Identifier,$2));} //perguntar pq e que o identifier pode ser null
                                                                     addchild($$,$4);}
     ;
 
@@ -82,24 +80,20 @@ funcdeclaration: FUNC funcheader funcbody                                       
                                                                                     addchild($$,$3);}
     ;
 
-funcheader: IDENTIFIER LPAR parameters RPAR type                                {$$=newnode(FuncHeader,NULL);
-                                                                                    addchild($$,newnode(Identifier,$1));
-                                                                                    addchild($$,$5);
-                                                                                    addchild($$,newnode(FuncParams,NULL));
-                                                                                    addchild($$,$3);}
-    | IDENTIFIER LPAR parameters RPAR                                           {$$=newnode(FuncHeader,NULL);
+funcheader: IDENTIFIER LPAR funcparams RPAR funcheader2                        {$$=newnode(FuncHeader,NULL);
                                                                                     addchild($$,newnode(Identifier,$1));
                                                                                     addchild($$,newnode(FuncParams,NULL));
-                                                                                    addchild($$,$3);}
-    | IDENTIFIER LPAR RPAR type                                                 {$$=newnode(FuncHeader,NULL);
-                                                                                    addchild($$,newnode(Identifier,$1));
-                                                                                    addchild($$,newnode(FuncParams,NULL));
-                                                                                    addchild($$,$4);}
-    | IDENTIFIER LPAR RPAR                                                      {$$=newnode(FuncHeader,NULL);
-                                                                                    addchild($$,newnode(Identifier,$1));
-                                                                                    addchild($$,newnode(FuncParams,NULL));}
+                                                                                    if($3!=NULL){addchild($$,$3);}
+                                                                                    if($5!=NULL){addchild($$,$5);}}
     ;
 
+funcparams: parameters                                                          {$$=$1;}
+    |/*vazio*/                                                                  {$$=NULL;}
+    ;
+
+funcheader2: type                                                               {$$=$1;}
+    |/*vazio*/                                                                  {$$=NULL;}
+    ;
 
 parameters: IDENTIFIER type parameters2                                         {$$=newnode(ParamDecl,NULL);
                                                                                     addchild($$,$2);
@@ -133,19 +127,30 @@ statement: IDENTIFIER ASSIGN expr                                               
                                                                                     addchild($$,$3);}
     | LBRACE statement2 RBRACE                                                  {$$=newnode(Block,NULL);
                                                                                     if($2!=NULL){addchild($$,$2);}}
-    | IF expr LBRACE statement2 RBRACE statement3                               {$$=newnode(If,NULL);
-                                                                                    if($2!=NULL){addchild($$,$2);}
-                                                                                    addchild($$,$4);
-                                                                                    if($6!=NULL){addchild($$,$6);}}
-    | FOR statement4 LBRACE statement2 RBRACE                                   {$$=newnode(For,NULL);
-                                                                                    if($2!=NULL){addchild($$,$2);}
+    | IF expr LBRACE statement2 RBRACE ELSE LBRACE statement2 RBRACE            {$$=newnode(If,NULL);
+                                                                                    addchild($$,$2);
+                                                                                    if($4!=NULL){addchild($$,$4);}
+                                                                                    if($8!=NULL){addchild($$,$8);}}
+    | IF expr LBRACE statement2 RBRACE                                          {$$=newnode(If,NULL);
+                                                                                    addchild($$,$2);
+                                                                                    if($4!=NULL){addchild($$,$4);}}                                                                                
+    | FOR expr LBRACE statement2 RBRACE                                         {$$=newnode(For,NULL);
+                                                                                    addchild($$,$2);
                                                                                     if($4!=NULL){addchild($$,$4);}}
-    | RETURN statement4                                                         {$$=newnode(Return,NULL);
-                                                                                    if($2!=NULL){addchild($$,$2);}}
+
+    | FOR  LBRACE statement2 RBRACE                                             {$$=newnode(For,NULL);
+                                                                                    if($3!=NULL){addchild($$,$3);}}
+    | RETURN expr                                                               {$$=newnode(Return,NULL);
+                                                                                    addchild($$,$2);}
+
+    | RETURN                                                                    {$$=newnode(Return,NULL);}
+
     | funcinvocation                                                            {$$=$1;}
     | parseargs                                                                 {$$=$1;}
-    | PRINT LPAR printstatement RPAR                                            {$$=newnode(Print,NULL);
-                                                                                    if($3!=NULL){addchild($$,$3);}}
+    | PRINT LPAR expr RPAR                                                      {$$=newnode(Print,NULL);
+                                                                                    addchild($$,$3);}
+    | PRINT LPAR STRLIT RPAR                                                    {$$=newnode(Print,NULL);
+                                                                                    addchild($$,newnode(StrLit,$3));}
     | error                                                                     {$$=NULL;}
 
 statement2: statement2 statement SEMICOLON                                      {$$=$1;
@@ -153,18 +158,9 @@ statement2: statement2 statement SEMICOLON                                      
     |/*vazio*/                                                                  {$$=NULL;}
     ;
 
-statement3: ELSE LBRACE statement2 RBRACE                                       {$$=$3;}
-    |/*vazio*/                                                                  {$$=NULL;}
-    ;
-
-statement4: expr                                                                {$$=$1;}
-    |/*vazio*/                                                                  {$$=NULL;}
-    ;
 
 
-printstatement: expr                                                            {$$=$1;}
-    | STRLIT                                                                    {$$=newnode(StrLit,$1);}
-    ;
+
 
 parseargs: IDENTIFIER COMMA BLANKID ASSIGN PARSEINT LPAR CMDARGS LSQ expr RSQ RPAR      {$$=newnode(ParseArgs,NULL);
                                                                                             addchild($$,newnode(Identifier,$1));
@@ -182,7 +178,7 @@ funcinvocation: IDENTIFIER LPAR expr funcinvocation2 RPAR                       
     ;
 
 funcinvocation2: COMMA expr funcinvocation2                                             {$$=$2;
-                                                                                            addchild($$,$2);}
+                                                                                            if($3!=NULL){addchild($$,$3);}}
     |/*vazio*/                                                                          {$$=NULL;}
     ;
 

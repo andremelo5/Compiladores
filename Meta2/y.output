@@ -29,126 +29,121 @@ Grammar
    12     | BOOL
    13     | STRING
 
-   14 funcdeclaration: FUNC funcheader funcbody
+   14 funcdeclaration: FUNC IDENTIFIER LPAR parameters RPAR type funcbody
+   15                | FUNC IDENTIFIER LPAR RPAR type funcbody
+   16                | FUNC IDENTIFIER LPAR parameters RPAR funcbody
+   17                | FUNC IDENTIFIER LPAR RPAR funcbody
 
-   15 funcheader: IDENTIFIER LPAR funcparams RPAR funcheader2
+   18 parameters: IDENTIFIER type parameters2
 
-   16 funcparams: parameters
-   17           | /* empty */
+   19 parameters2: COMMA IDENTIFIER type parameters2
+   20            | /* empty */
 
-   18 funcheader2: type
-   19            | /* empty */
+   21 funcbody: LBRACE varsandstatements RBRACE
 
-   20 parameters: IDENTIFIER type parameters2
+   22 varsandstatements: varsandstatements SEMICOLON
+   23                  | varsandstatements vardeclaration SEMICOLON
+   24                  | varsandstatements statement SEMICOLON
+   25                  | /* empty */
 
-   21 parameters2: COMMA IDENTIFIER type parameters2
-   22            | /* empty */
+   26 statement: IDENTIFIER ASSIGN expr
+   27          | LBRACE statement2 RBRACE
+   28          | IF expr LBRACE statement2 RBRACE ELSE LBRACE statement2 RBRACE
+   29          | IF expr LBRACE statement2 RBRACE
+   30          | FOR expr LBRACE statement2 RBRACE
+   31          | FOR LBRACE statement2 RBRACE
+   32          | RETURN expr
+   33          | RETURN
+   34          | funcinvocation
+   35          | parseargs
+   36          | PRINT LPAR expr RPAR
+   37          | PRINT LPAR STRLIT RPAR
+   38          | error
 
-   23 funcbody: LBRACE varsandstatements RBRACE
+   39 statement2: statement2 statement SEMICOLON
+   40           | /* empty */
 
-   24 varsandstatements: varsandstatements SEMICOLON
-   25                  | varsandstatements vardeclaration SEMICOLON
-   26                  | varsandstatements statement SEMICOLON
-   27                  | /* empty */
+   41 parseargs: IDENTIFIER COMMA BLANKID ASSIGN PARSEINT LPAR CMDARGS LSQ expr RSQ RPAR
+   42          | IDENTIFIER COMMA BLANKID ASSIGN PARSEINT LPAR error RPAR
 
-   28 statement: IDENTIFIER ASSIGN expr
-   29          | LBRACE statement2 RBRACE
-   30          | IF expr LBRACE statement2 RBRACE ELSE LBRACE statement2 RBRACE
-   31          | IF expr LBRACE statement2 RBRACE
-   32          | FOR expr LBRACE statement2 RBRACE
-   33          | FOR LBRACE statement2 RBRACE
-   34          | RETURN expr
-   35          | RETURN
-   36          | funcinvocation
-   37          | parseargs
-   38          | PRINT LPAR expr RPAR
-   39          | PRINT LPAR STRLIT RPAR
-   40          | error
+   43 funcinvocation: IDENTIFIER LPAR expr funcinvocation2 RPAR
+   44               | IDENTIFIER LPAR RPAR
+   45               | IDENTIFIER LPAR error RPAR
 
-   41 statement2: statement2 statement SEMICOLON
-   42           | /* empty */
+   46 funcinvocation2: COMMA expr funcinvocation2
+   47                | /* empty */
 
-   43 parseargs: IDENTIFIER COMMA BLANKID ASSIGN PARSEINT LPAR CMDARGS LSQ expr RSQ RPAR
-   44          | IDENTIFIER COMMA BLANKID ASSIGN PARSEINT LPAR error RPAR
-
-   45 funcinvocation: IDENTIFIER LPAR expr funcinvocation2 RPAR
-   46               | IDENTIFIER LPAR RPAR
-   47               | IDENTIFIER LPAR error RPAR
-
-   48 funcinvocation2: COMMA expr funcinvocation2
-   49                | /* empty */
-
-   50 expr: expr OR expr
-   51     | expr AND expr
-   52     | expr LT expr
-   53     | expr GT expr
-   54     | expr EQ expr
-   55     | expr NE expr
-   56     | expr LE expr
-   57     | expr GE expr
-   58     | expr PLUS expr
-   59     | expr MINUS expr
-   60     | expr STAR expr
-   61     | expr DIV expr
-   62     | expr MOD expr
-   63     | NOT expr
-   64     | MINUS expr
-   65     | PLUS expr
-   66     | NATURAL
-   67     | DECIMAL
-   68     | IDENTIFIER
-   69     | funcinvocation
-   70     | LPAR expr RPAR
-   71     | LPAR error RPAR
+   48 expr: expr OR expr
+   49     | expr AND expr
+   50     | expr LT expr
+   51     | expr GT expr
+   52     | expr EQ expr
+   53     | expr NE expr
+   54     | expr LE expr
+   55     | expr GE expr
+   56     | expr PLUS expr
+   57     | expr MINUS expr
+   58     | expr STAR expr
+   59     | expr DIV expr
+   60     | expr MOD expr
+   61     | NOT expr
+   62     | MINUS expr
+   63     | PLUS expr
+   64     | NATURAL
+   65     | DECIMAL
+   66     | IDENTIFIER
+   67     | funcinvocation
+   68     | LPAR expr RPAR
+   69     | LPAR error RPAR
 
 
 Terminals, with rules where they appear
 
 $end (0) 0
-error (256) 40 44 47 71
-SEMICOLON (258) 1 2 3 6 24 25 26 41
-COMMA (259) 8 21 43 44 48
-BLANKID (260) 43 44
-ASSIGN (261) 28 43 44
-STAR (262) 60
-DIV (263) 61
-MINUS (264) 59 64
-PLUS (265) 58 65
-EQ (266) 54
-GE (267) 57
-GT (268) 53
-LBRACE (269) 23 29 30 31 32 33
-LE (270) 56
-LPAR (271) 6 15 38 39 43 44 45 46 47 70 71
-LSQ (272) 43
-LT (273) 52
-MOD (274) 62
-NE (275) 55
-NOT (276) 63
-AND (277) 51
-OR (278) 50
-RBRACE (279) 23 29 30 31 32 33
-RPAR (280) 6 15 38 39 43 44 45 46 47 70 71
-RSQ (281) 43
+error (256) 38 42 45 69
+SEMICOLON (258) 1 2 3 6 22 23 24 39
+COMMA (259) 8 19 41 42 46
+BLANKID (260) 41 42
+ASSIGN (261) 26 41 42
+STAR (262) 58
+DIV (263) 59
+MINUS (264) 57 62
+PLUS (265) 56 63
+EQ (266) 52
+GE (267) 55
+GT (268) 51
+LBRACE (269) 21 27 28 29 30 31
+LE (270) 54
+LPAR (271) 6 14 15 16 17 36 37 41 42 43 44 45 68 69
+LSQ (272) 41
+LT (273) 50
+MOD (274) 60
+NE (275) 53
+NOT (276) 61
+AND (277) 49
+OR (278) 48
+RBRACE (279) 21 27 28 29 30 31
+RPAR (280) 6 14 15 16 17 36 37 41 42 43 44 45 68 69
+RSQ (281) 41
 PACKAGE (282) 1
-RETURN (283) 34 35
-ELSE (284) 30
-FOR (285) 32 33
-IF (286) 30 31
+RETURN (283) 32 33
+ELSE (284) 28
+FOR (285) 30 31
+IF (286) 28 29
 VAR (287) 5 6
 INT (288) 10
 FLOAT32 (289) 11
 BOOL (290) 12
 STRING (291) 13
-PRINT (292) 38 39
-PARSEINT (293) 43 44
-FUNC (294) 14
-CMDARGS (295) 43
+PRINT (292) 36 37
+PARSEINT (293) 41 42
+FUNC (294) 14 15 16 17
+CMDARGS (295) 41
 RESERVED (296)
-IDENTIFIER (297) 1 7 8 15 20 21 28 43 44 45 46 47 68
-NATURAL (298) 66
-DECIMAL (299) 67
-STRLIT (300) 39
+IDENTIFIER (297) 1 7 8 14 15 16 17 18 19 26 41 42 43 44 45 66
+NATURAL (298) 64
+DECIMAL (299) 65
+STRLIT (300) 37
 UPLUS (301)
 UMINUS (302)
 IFELSE (303)
@@ -163,44 +158,38 @@ program (50)
 declarations (51)
     on left: 2 3 4, on right: 1 2 3
 vardeclaration (52)
-    on left: 5 6, on right: 2 25
+    on left: 5 6, on right: 2 23
 varspec (53)
     on left: 7, on right: 5 6
 varspec2 (54)
     on left: 8 9, on right: 7 8
 type (55)
-    on left: 10 11 12 13, on right: 7 18 20 21
+    on left: 10 11 12 13, on right: 7 14 15 18 19
 funcdeclaration (56)
-    on left: 14, on right: 3
-funcheader (57)
-    on left: 15, on right: 14
-funcparams (58)
-    on left: 16 17, on right: 15
-funcheader2 (59)
-    on left: 18 19, on right: 15
-parameters (60)
-    on left: 20, on right: 16
-parameters2 (61)
-    on left: 21 22, on right: 20 21
-funcbody (62)
-    on left: 23, on right: 14
-varsandstatements (63)
-    on left: 24 25 26 27, on right: 23 24 25 26
-statement (64)
-    on left: 28 29 30 31 32 33 34 35 36 37 38 39 40,
-    on right: 26 41
-statement2 (65)
-    on left: 41 42, on right: 29 30 31 32 33 41
-parseargs (66)
-    on left: 43 44, on right: 37
-funcinvocation (67)
-    on left: 45 46 47, on right: 36 69
-funcinvocation2 (68)
-    on left: 48 49, on right: 45 48
-expr (69)
-    on left: 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66 67
-    68 69 70 71, on right: 28 30 31 32 34 38 43 45 48 50 51 52 53 54
-    55 56 57 58 59 60 61 62 63 64 65 70
+    on left: 14 15 16 17, on right: 3
+parameters (57)
+    on left: 18, on right: 14 16
+parameters2 (58)
+    on left: 19 20, on right: 18 19
+funcbody (59)
+    on left: 21, on right: 14 15 16 17
+varsandstatements (60)
+    on left: 22 23 24 25, on right: 21 22 23 24
+statement (61)
+    on left: 26 27 28 29 30 31 32 33 34 35 36 37 38,
+    on right: 24 39
+statement2 (62)
+    on left: 39 40, on right: 27 28 29 30 31 39
+parseargs (63)
+    on left: 41 42, on right: 35
+funcinvocation (64)
+    on left: 43 44 45, on right: 34 67
+funcinvocation2 (65)
+    on left: 46 47, on right: 43 46
+expr (66)
+    on left: 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65
+    66 67 68 69, on right: 26 28 29 30 32 36 41 43 46 48 49 50 51 52
+    53 54 55 56 57 58 59 60 61 62 63 68
 
 
 state 0
@@ -249,7 +238,10 @@ state 5
     4             | .  [$end]
     5 vardeclaration: . VAR varspec
     6               | . VAR LPAR varspec SEMICOLON RPAR
-   14 funcdeclaration: . FUNC funcheader funcbody
+   14 funcdeclaration: . FUNC IDENTIFIER LPAR parameters RPAR type funcbody
+   15                | . FUNC IDENTIFIER LPAR RPAR type funcbody
+   16                | . FUNC IDENTIFIER LPAR parameters RPAR funcbody
+   17                | . FUNC IDENTIFIER LPAR RPAR funcbody
 
     VAR   shift, and go to state 6
     FUNC  shift, and go to state 7
@@ -275,12 +267,12 @@ state 6
 
 state 7
 
-   14 funcdeclaration: FUNC . funcheader funcbody
-   15 funcheader: . IDENTIFIER LPAR funcparams RPAR funcheader2
+   14 funcdeclaration: FUNC . IDENTIFIER LPAR parameters RPAR type funcbody
+   15                | FUNC . IDENTIFIER LPAR RPAR type funcbody
+   16                | FUNC . IDENTIFIER LPAR parameters RPAR funcbody
+   17                | FUNC . IDENTIFIER LPAR RPAR funcbody
 
     IDENTIFIER  shift, and go to state 14
-
-    funcheader  go to state 15
 
 
 state 8
@@ -294,14 +286,14 @@ state 9
 
     2 declarations: vardeclaration . SEMICOLON declarations
 
-    SEMICOLON  shift, and go to state 16
+    SEMICOLON  shift, and go to state 15
 
 
 state 10
 
     3 declarations: funcdeclaration . SEMICOLON declarations
 
-    SEMICOLON  shift, and go to state 17
+    SEMICOLON  shift, and go to state 16
 
 
 state 11
@@ -311,7 +303,7 @@ state 11
 
     IDENTIFIER  shift, and go to state 12
 
-    varspec  go to state 18
+    varspec  go to state 17
 
 
 state 12
@@ -320,11 +312,11 @@ state 12
     8 varspec2: . COMMA IDENTIFIER varspec2
     9         | .  [INT, FLOAT32, BOOL, STRING]
 
-    COMMA  shift, and go to state 19
+    COMMA  shift, and go to state 18
 
     $default  reduce using rule 9 (varspec2)
 
-    varspec2  go to state 20
+    varspec2  go to state 19
 
 
 state 13
@@ -336,22 +328,15 @@ state 13
 
 state 14
 
-   15 funcheader: IDENTIFIER . LPAR funcparams RPAR funcheader2
+   14 funcdeclaration: FUNC IDENTIFIER . LPAR parameters RPAR type funcbody
+   15                | FUNC IDENTIFIER . LPAR RPAR type funcbody
+   16                | FUNC IDENTIFIER . LPAR parameters RPAR funcbody
+   17                | FUNC IDENTIFIER . LPAR RPAR funcbody
 
-    LPAR  shift, and go to state 21
+    LPAR  shift, and go to state 20
 
 
 state 15
-
-   14 funcdeclaration: FUNC funcheader . funcbody
-   23 funcbody: . LBRACE varsandstatements RBRACE
-
-    LBRACE  shift, and go to state 22
-
-    funcbody  go to state 23
-
-
-state 16
 
     2 declarations: . vardeclaration SEMICOLON declarations
     2             | vardeclaration SEMICOLON . declarations
@@ -359,19 +344,22 @@ state 16
     4             | .  [$end]
     5 vardeclaration: . VAR varspec
     6               | . VAR LPAR varspec SEMICOLON RPAR
-   14 funcdeclaration: . FUNC funcheader funcbody
+   14 funcdeclaration: . FUNC IDENTIFIER LPAR parameters RPAR type funcbody
+   15                | . FUNC IDENTIFIER LPAR RPAR type funcbody
+   16                | . FUNC IDENTIFIER LPAR parameters RPAR funcbody
+   17                | . FUNC IDENTIFIER LPAR RPAR funcbody
 
     VAR   shift, and go to state 6
     FUNC  shift, and go to state 7
 
     $default  reduce using rule 4 (declarations)
 
-    declarations     go to state 24
+    declarations     go to state 21
     vardeclaration   go to state 9
     funcdeclaration  go to state 10
 
 
-state 17
+state 16
 
     2 declarations: . vardeclaration SEMICOLON declarations
     3             | . funcdeclaration SEMICOLON declarations
@@ -379,33 +367,36 @@ state 17
     4             | .  [$end]
     5 vardeclaration: . VAR varspec
     6               | . VAR LPAR varspec SEMICOLON RPAR
-   14 funcdeclaration: . FUNC funcheader funcbody
+   14 funcdeclaration: . FUNC IDENTIFIER LPAR parameters RPAR type funcbody
+   15                | . FUNC IDENTIFIER LPAR RPAR type funcbody
+   16                | . FUNC IDENTIFIER LPAR parameters RPAR funcbody
+   17                | . FUNC IDENTIFIER LPAR RPAR funcbody
 
     VAR   shift, and go to state 6
     FUNC  shift, and go to state 7
 
     $default  reduce using rule 4 (declarations)
 
-    declarations     go to state 25
+    declarations     go to state 22
     vardeclaration   go to state 9
     funcdeclaration  go to state 10
 
 
-state 18
+state 17
 
     6 vardeclaration: VAR LPAR varspec . SEMICOLON RPAR
 
-    SEMICOLON  shift, and go to state 26
+    SEMICOLON  shift, and go to state 23
 
 
-state 19
+state 18
 
     8 varspec2: COMMA . IDENTIFIER varspec2
 
-    IDENTIFIER  shift, and go to state 27
+    IDENTIFIER  shift, and go to state 24
 
 
-state 20
+state 19
 
     7 varspec: IDENTIFIER varspec2 . type
    10 type: . INT
@@ -413,2862 +404,2901 @@ state 20
    12     | . BOOL
    13     | . STRING
 
-    INT      shift, and go to state 28
-    FLOAT32  shift, and go to state 29
-    BOOL     shift, and go to state 30
-    STRING   shift, and go to state 31
+    INT      shift, and go to state 25
+    FLOAT32  shift, and go to state 26
+    BOOL     shift, and go to state 27
+    STRING   shift, and go to state 28
 
-    type  go to state 32
+    type  go to state 29
+
+
+state 20
+
+   14 funcdeclaration: FUNC IDENTIFIER LPAR . parameters RPAR type funcbody
+   15                | FUNC IDENTIFIER LPAR . RPAR type funcbody
+   16                | FUNC IDENTIFIER LPAR . parameters RPAR funcbody
+   17                | FUNC IDENTIFIER LPAR . RPAR funcbody
+   18 parameters: . IDENTIFIER type parameters2
+
+    RPAR        shift, and go to state 30
+    IDENTIFIER  shift, and go to state 31
+
+    parameters  go to state 32
 
 
 state 21
-
-   15 funcheader: IDENTIFIER LPAR . funcparams RPAR funcheader2
-   16 funcparams: . parameters
-   17           | .  [RPAR]
-   20 parameters: . IDENTIFIER type parameters2
-
-    IDENTIFIER  shift, and go to state 33
-
-    $default  reduce using rule 17 (funcparams)
-
-    funcparams  go to state 34
-    parameters  go to state 35
-
-
-state 22
-
-   23 funcbody: LBRACE . varsandstatements RBRACE
-   24 varsandstatements: . varsandstatements SEMICOLON
-   25                  | . varsandstatements vardeclaration SEMICOLON
-   26                  | . varsandstatements statement SEMICOLON
-   27                  | .
-
-    $default  reduce using rule 27 (varsandstatements)
-
-    varsandstatements  go to state 36
-
-
-state 23
-
-   14 funcdeclaration: FUNC funcheader funcbody .
-
-    $default  reduce using rule 14 (funcdeclaration)
-
-
-state 24
 
     2 declarations: vardeclaration SEMICOLON declarations .
 
     $default  reduce using rule 2 (declarations)
 
 
-state 25
+state 22
 
     3 declarations: funcdeclaration SEMICOLON declarations .
 
     $default  reduce using rule 3 (declarations)
 
 
-state 26
+state 23
 
     6 vardeclaration: VAR LPAR varspec SEMICOLON . RPAR
 
-    RPAR  shift, and go to state 37
+    RPAR  shift, and go to state 33
 
 
-state 27
+state 24
 
     8 varspec2: . COMMA IDENTIFIER varspec2
     8         | COMMA IDENTIFIER . varspec2
     9         | .  [INT, FLOAT32, BOOL, STRING]
 
-    COMMA  shift, and go to state 19
+    COMMA  shift, and go to state 18
 
     $default  reduce using rule 9 (varspec2)
 
-    varspec2  go to state 38
+    varspec2  go to state 34
 
 
-state 28
+state 25
 
    10 type: INT .
 
     $default  reduce using rule 10 (type)
 
 
-state 29
+state 26
 
    11 type: FLOAT32 .
 
     $default  reduce using rule 11 (type)
 
 
-state 30
+state 27
 
    12 type: BOOL .
 
     $default  reduce using rule 12 (type)
 
 
-state 31
+state 28
 
    13 type: STRING .
 
     $default  reduce using rule 13 (type)
 
 
-state 32
+state 29
 
     7 varspec: IDENTIFIER varspec2 type .
 
     $default  reduce using rule 7 (varspec)
 
 
-state 33
+state 30
 
    10 type: . INT
    11     | . FLOAT32
    12     | . BOOL
    13     | . STRING
-   20 parameters: IDENTIFIER . type parameters2
+   15 funcdeclaration: FUNC IDENTIFIER LPAR RPAR . type funcbody
+   17                | FUNC IDENTIFIER LPAR RPAR . funcbody
+   21 funcbody: . LBRACE varsandstatements RBRACE
 
-    INT      shift, and go to state 28
-    FLOAT32  shift, and go to state 29
-    BOOL     shift, and go to state 30
-    STRING   shift, and go to state 31
+    LBRACE   shift, and go to state 35
+    INT      shift, and go to state 25
+    FLOAT32  shift, and go to state 26
+    BOOL     shift, and go to state 27
+    STRING   shift, and go to state 28
 
-    type  go to state 39
-
-
-state 34
-
-   15 funcheader: IDENTIFIER LPAR funcparams . RPAR funcheader2
-
-    RPAR  shift, and go to state 40
+    type      go to state 36
+    funcbody  go to state 37
 
 
-state 35
+state 31
 
-   16 funcparams: parameters .
+   10 type: . INT
+   11     | . FLOAT32
+   12     | . BOOL
+   13     | . STRING
+   18 parameters: IDENTIFIER . type parameters2
 
-    $default  reduce using rule 16 (funcparams)
+    INT      shift, and go to state 25
+    FLOAT32  shift, and go to state 26
+    BOOL     shift, and go to state 27
+    STRING   shift, and go to state 28
 
-
-state 36
-
-    5 vardeclaration: . VAR varspec
-    6               | . VAR LPAR varspec SEMICOLON RPAR
-   23 funcbody: LBRACE varsandstatements . RBRACE
-   24 varsandstatements: varsandstatements . SEMICOLON
-   25                  | varsandstatements . vardeclaration SEMICOLON
-   26                  | varsandstatements . statement SEMICOLON
-   28 statement: . IDENTIFIER ASSIGN expr
-   29          | . LBRACE statement2 RBRACE
-   30          | . IF expr LBRACE statement2 RBRACE ELSE LBRACE statement2 RBRACE
-   31          | . IF expr LBRACE statement2 RBRACE
-   32          | . FOR expr LBRACE statement2 RBRACE
-   33          | . FOR LBRACE statement2 RBRACE
-   34          | . RETURN expr
-   35          | . RETURN
-   36          | . funcinvocation
-   37          | . parseargs
-   38          | . PRINT LPAR expr RPAR
-   39          | . PRINT LPAR STRLIT RPAR
-   40          | . error
-   43 parseargs: . IDENTIFIER COMMA BLANKID ASSIGN PARSEINT LPAR CMDARGS LSQ expr RSQ RPAR
-   44          | . IDENTIFIER COMMA BLANKID ASSIGN PARSEINT LPAR error RPAR
-   45 funcinvocation: . IDENTIFIER LPAR expr funcinvocation2 RPAR
-   46               | . IDENTIFIER LPAR RPAR
-   47               | . IDENTIFIER LPAR error RPAR
-
-    error       shift, and go to state 41
-    SEMICOLON   shift, and go to state 42
-    LBRACE      shift, and go to state 43
-    RBRACE      shift, and go to state 44
-    RETURN      shift, and go to state 45
-    FOR         shift, and go to state 46
-    IF          shift, and go to state 47
-    VAR         shift, and go to state 6
-    PRINT       shift, and go to state 48
-    IDENTIFIER  shift, and go to state 49
-
-    vardeclaration  go to state 50
-    statement       go to state 51
-    parseargs       go to state 52
-    funcinvocation  go to state 53
+    type  go to state 38
 
 
-state 37
+state 32
+
+   14 funcdeclaration: FUNC IDENTIFIER LPAR parameters . RPAR type funcbody
+   16                | FUNC IDENTIFIER LPAR parameters . RPAR funcbody
+
+    RPAR  shift, and go to state 39
+
+
+state 33
 
     6 vardeclaration: VAR LPAR varspec SEMICOLON RPAR .
 
     $default  reduce using rule 6 (vardeclaration)
 
 
-state 38
+state 34
 
     8 varspec2: COMMA IDENTIFIER varspec2 .
 
     $default  reduce using rule 8 (varspec2)
 
 
+state 35
+
+   21 funcbody: LBRACE . varsandstatements RBRACE
+   22 varsandstatements: . varsandstatements SEMICOLON
+   23                  | . varsandstatements vardeclaration SEMICOLON
+   24                  | . varsandstatements statement SEMICOLON
+   25                  | .
+
+    $default  reduce using rule 25 (varsandstatements)
+
+    varsandstatements  go to state 40
+
+
+state 36
+
+   15 funcdeclaration: FUNC IDENTIFIER LPAR RPAR type . funcbody
+   21 funcbody: . LBRACE varsandstatements RBRACE
+
+    LBRACE  shift, and go to state 35
+
+    funcbody  go to state 41
+
+
+state 37
+
+   17 funcdeclaration: FUNC IDENTIFIER LPAR RPAR funcbody .
+
+    $default  reduce using rule 17 (funcdeclaration)
+
+
+state 38
+
+   18 parameters: IDENTIFIER type . parameters2
+   19 parameters2: . COMMA IDENTIFIER type parameters2
+   20            | .  [RPAR]
+
+    COMMA  shift, and go to state 42
+
+    $default  reduce using rule 20 (parameters2)
+
+    parameters2  go to state 43
+
+
 state 39
 
-   20 parameters: IDENTIFIER type . parameters2
-   21 parameters2: . COMMA IDENTIFIER type parameters2
-   22            | .  [RPAR]
+   10 type: . INT
+   11     | . FLOAT32
+   12     | . BOOL
+   13     | . STRING
+   14 funcdeclaration: FUNC IDENTIFIER LPAR parameters RPAR . type funcbody
+   16                | FUNC IDENTIFIER LPAR parameters RPAR . funcbody
+   21 funcbody: . LBRACE varsandstatements RBRACE
 
-    COMMA  shift, and go to state 54
+    LBRACE   shift, and go to state 35
+    INT      shift, and go to state 25
+    FLOAT32  shift, and go to state 26
+    BOOL     shift, and go to state 27
+    STRING   shift, and go to state 28
 
-    $default  reduce using rule 22 (parameters2)
-
-    parameters2  go to state 55
+    type      go to state 44
+    funcbody  go to state 45
 
 
 state 40
 
-   10 type: . INT
-   11     | . FLOAT32
-   12     | . BOOL
-   13     | . STRING
-   15 funcheader: IDENTIFIER LPAR funcparams RPAR . funcheader2
-   18 funcheader2: . type
-   19            | .  [LBRACE]
+    5 vardeclaration: . VAR varspec
+    6               | . VAR LPAR varspec SEMICOLON RPAR
+   21 funcbody: LBRACE varsandstatements . RBRACE
+   22 varsandstatements: varsandstatements . SEMICOLON
+   23                  | varsandstatements . vardeclaration SEMICOLON
+   24                  | varsandstatements . statement SEMICOLON
+   26 statement: . IDENTIFIER ASSIGN expr
+   27          | . LBRACE statement2 RBRACE
+   28          | . IF expr LBRACE statement2 RBRACE ELSE LBRACE statement2 RBRACE
+   29          | . IF expr LBRACE statement2 RBRACE
+   30          | . FOR expr LBRACE statement2 RBRACE
+   31          | . FOR LBRACE statement2 RBRACE
+   32          | . RETURN expr
+   33          | . RETURN
+   34          | . funcinvocation
+   35          | . parseargs
+   36          | . PRINT LPAR expr RPAR
+   37          | . PRINT LPAR STRLIT RPAR
+   38          | . error
+   41 parseargs: . IDENTIFIER COMMA BLANKID ASSIGN PARSEINT LPAR CMDARGS LSQ expr RSQ RPAR
+   42          | . IDENTIFIER COMMA BLANKID ASSIGN PARSEINT LPAR error RPAR
+   43 funcinvocation: . IDENTIFIER LPAR expr funcinvocation2 RPAR
+   44               | . IDENTIFIER LPAR RPAR
+   45               | . IDENTIFIER LPAR error RPAR
 
-    INT      shift, and go to state 28
-    FLOAT32  shift, and go to state 29
-    BOOL     shift, and go to state 30
-    STRING   shift, and go to state 31
+    error       shift, and go to state 46
+    SEMICOLON   shift, and go to state 47
+    LBRACE      shift, and go to state 48
+    RBRACE      shift, and go to state 49
+    RETURN      shift, and go to state 50
+    FOR         shift, and go to state 51
+    IF          shift, and go to state 52
+    VAR         shift, and go to state 6
+    PRINT       shift, and go to state 53
+    IDENTIFIER  shift, and go to state 54
 
-    $default  reduce using rule 19 (funcheader2)
-
-    type         go to state 56
-    funcheader2  go to state 57
+    vardeclaration  go to state 55
+    statement       go to state 56
+    parseargs       go to state 57
+    funcinvocation  go to state 58
 
 
 state 41
 
-   40 statement: error .
+   15 funcdeclaration: FUNC IDENTIFIER LPAR RPAR type funcbody .
 
-    $default  reduce using rule 40 (statement)
+    $default  reduce using rule 15 (funcdeclaration)
 
 
 state 42
 
-   24 varsandstatements: varsandstatements SEMICOLON .
+   19 parameters2: COMMA . IDENTIFIER type parameters2
 
-    $default  reduce using rule 24 (varsandstatements)
+    IDENTIFIER  shift, and go to state 59
 
 
 state 43
 
-   29 statement: LBRACE . statement2 RBRACE
-   41 statement2: . statement2 statement SEMICOLON
-   42           | .
+   18 parameters: IDENTIFIER type parameters2 .
 
-    $default  reduce using rule 42 (statement2)
-
-    statement2  go to state 58
+    $default  reduce using rule 18 (parameters)
 
 
 state 44
 
-   23 funcbody: LBRACE varsandstatements RBRACE .
+   14 funcdeclaration: FUNC IDENTIFIER LPAR parameters RPAR type . funcbody
+   21 funcbody: . LBRACE varsandstatements RBRACE
 
-    $default  reduce using rule 23 (funcbody)
+    LBRACE  shift, and go to state 35
+
+    funcbody  go to state 60
 
 
 state 45
 
-   34 statement: RETURN . expr
-   35          | RETURN .  [SEMICOLON]
-   45 funcinvocation: . IDENTIFIER LPAR expr funcinvocation2 RPAR
-   46               | . IDENTIFIER LPAR RPAR
-   47               | . IDENTIFIER LPAR error RPAR
-   50 expr: . expr OR expr
-   51     | . expr AND expr
-   52     | . expr LT expr
-   53     | . expr GT expr
-   54     | . expr EQ expr
-   55     | . expr NE expr
-   56     | . expr LE expr
-   57     | . expr GE expr
-   58     | . expr PLUS expr
-   59     | . expr MINUS expr
-   60     | . expr STAR expr
-   61     | . expr DIV expr
-   62     | . expr MOD expr
-   63     | . NOT expr
-   64     | . MINUS expr
-   65     | . PLUS expr
-   66     | . NATURAL
-   67     | . DECIMAL
-   68     | . IDENTIFIER
-   69     | . funcinvocation
-   70     | . LPAR expr RPAR
-   71     | . LPAR error RPAR
+   16 funcdeclaration: FUNC IDENTIFIER LPAR parameters RPAR funcbody .
 
-    MINUS       shift, and go to state 59
-    PLUS        shift, and go to state 60
-    LPAR        shift, and go to state 61
-    NOT         shift, and go to state 62
-    IDENTIFIER  shift, and go to state 63
-    NATURAL     shift, and go to state 64
-    DECIMAL     shift, and go to state 65
-
-    $default  reduce using rule 35 (statement)
-
-    funcinvocation  go to state 66
-    expr            go to state 67
+    $default  reduce using rule 16 (funcdeclaration)
 
 
 state 46
 
-   32 statement: FOR . expr LBRACE statement2 RBRACE
-   33          | FOR . LBRACE statement2 RBRACE
-   45 funcinvocation: . IDENTIFIER LPAR expr funcinvocation2 RPAR
-   46               | . IDENTIFIER LPAR RPAR
-   47               | . IDENTIFIER LPAR error RPAR
-   50 expr: . expr OR expr
-   51     | . expr AND expr
-   52     | . expr LT expr
-   53     | . expr GT expr
-   54     | . expr EQ expr
-   55     | . expr NE expr
-   56     | . expr LE expr
-   57     | . expr GE expr
-   58     | . expr PLUS expr
-   59     | . expr MINUS expr
-   60     | . expr STAR expr
-   61     | . expr DIV expr
-   62     | . expr MOD expr
-   63     | . NOT expr
-   64     | . MINUS expr
-   65     | . PLUS expr
-   66     | . NATURAL
-   67     | . DECIMAL
-   68     | . IDENTIFIER
-   69     | . funcinvocation
-   70     | . LPAR expr RPAR
-   71     | . LPAR error RPAR
+   38 statement: error .
 
-    MINUS       shift, and go to state 59
-    PLUS        shift, and go to state 60
-    LBRACE      shift, and go to state 68
-    LPAR        shift, and go to state 61
-    NOT         shift, and go to state 62
-    IDENTIFIER  shift, and go to state 63
-    NATURAL     shift, and go to state 64
-    DECIMAL     shift, and go to state 65
-
-    funcinvocation  go to state 66
-    expr            go to state 69
+    $default  reduce using rule 38 (statement)
 
 
 state 47
 
-   30 statement: IF . expr LBRACE statement2 RBRACE ELSE LBRACE statement2 RBRACE
-   31          | IF . expr LBRACE statement2 RBRACE
-   45 funcinvocation: . IDENTIFIER LPAR expr funcinvocation2 RPAR
-   46               | . IDENTIFIER LPAR RPAR
-   47               | . IDENTIFIER LPAR error RPAR
-   50 expr: . expr OR expr
-   51     | . expr AND expr
-   52     | . expr LT expr
-   53     | . expr GT expr
-   54     | . expr EQ expr
-   55     | . expr NE expr
-   56     | . expr LE expr
-   57     | . expr GE expr
-   58     | . expr PLUS expr
-   59     | . expr MINUS expr
-   60     | . expr STAR expr
-   61     | . expr DIV expr
-   62     | . expr MOD expr
-   63     | . NOT expr
-   64     | . MINUS expr
-   65     | . PLUS expr
-   66     | . NATURAL
-   67     | . DECIMAL
-   68     | . IDENTIFIER
-   69     | . funcinvocation
-   70     | . LPAR expr RPAR
-   71     | . LPAR error RPAR
+   22 varsandstatements: varsandstatements SEMICOLON .
 
-    MINUS       shift, and go to state 59
-    PLUS        shift, and go to state 60
-    LPAR        shift, and go to state 61
-    NOT         shift, and go to state 62
-    IDENTIFIER  shift, and go to state 63
-    NATURAL     shift, and go to state 64
-    DECIMAL     shift, and go to state 65
-
-    funcinvocation  go to state 66
-    expr            go to state 70
+    $default  reduce using rule 22 (varsandstatements)
 
 
 state 48
 
-   38 statement: PRINT . LPAR expr RPAR
-   39          | PRINT . LPAR STRLIT RPAR
+   27 statement: LBRACE . statement2 RBRACE
+   39 statement2: . statement2 statement SEMICOLON
+   40           | .
 
-    LPAR  shift, and go to state 71
+    $default  reduce using rule 40 (statement2)
+
+    statement2  go to state 61
 
 
 state 49
 
-   28 statement: IDENTIFIER . ASSIGN expr
-   43 parseargs: IDENTIFIER . COMMA BLANKID ASSIGN PARSEINT LPAR CMDARGS LSQ expr RSQ RPAR
-   44          | IDENTIFIER . COMMA BLANKID ASSIGN PARSEINT LPAR error RPAR
-   45 funcinvocation: IDENTIFIER . LPAR expr funcinvocation2 RPAR
-   46               | IDENTIFIER . LPAR RPAR
-   47               | IDENTIFIER . LPAR error RPAR
+   21 funcbody: LBRACE varsandstatements RBRACE .
 
-    COMMA   shift, and go to state 72
-    ASSIGN  shift, and go to state 73
-    LPAR    shift, and go to state 74
+    $default  reduce using rule 21 (funcbody)
 
 
 state 50
 
-   25 varsandstatements: varsandstatements vardeclaration . SEMICOLON
+   32 statement: RETURN . expr
+   33          | RETURN .  [SEMICOLON]
+   43 funcinvocation: . IDENTIFIER LPAR expr funcinvocation2 RPAR
+   44               | . IDENTIFIER LPAR RPAR
+   45               | . IDENTIFIER LPAR error RPAR
+   48 expr: . expr OR expr
+   49     | . expr AND expr
+   50     | . expr LT expr
+   51     | . expr GT expr
+   52     | . expr EQ expr
+   53     | . expr NE expr
+   54     | . expr LE expr
+   55     | . expr GE expr
+   56     | . expr PLUS expr
+   57     | . expr MINUS expr
+   58     | . expr STAR expr
+   59     | . expr DIV expr
+   60     | . expr MOD expr
+   61     | . NOT expr
+   62     | . MINUS expr
+   63     | . PLUS expr
+   64     | . NATURAL
+   65     | . DECIMAL
+   66     | . IDENTIFIER
+   67     | . funcinvocation
+   68     | . LPAR expr RPAR
+   69     | . LPAR error RPAR
 
-    SEMICOLON  shift, and go to state 75
+    MINUS       shift, and go to state 62
+    PLUS        shift, and go to state 63
+    LPAR        shift, and go to state 64
+    NOT         shift, and go to state 65
+    IDENTIFIER  shift, and go to state 66
+    NATURAL     shift, and go to state 67
+    DECIMAL     shift, and go to state 68
+
+    $default  reduce using rule 33 (statement)
+
+    funcinvocation  go to state 69
+    expr            go to state 70
 
 
 state 51
 
-   26 varsandstatements: varsandstatements statement . SEMICOLON
+   30 statement: FOR . expr LBRACE statement2 RBRACE
+   31          | FOR . LBRACE statement2 RBRACE
+   43 funcinvocation: . IDENTIFIER LPAR expr funcinvocation2 RPAR
+   44               | . IDENTIFIER LPAR RPAR
+   45               | . IDENTIFIER LPAR error RPAR
+   48 expr: . expr OR expr
+   49     | . expr AND expr
+   50     | . expr LT expr
+   51     | . expr GT expr
+   52     | . expr EQ expr
+   53     | . expr NE expr
+   54     | . expr LE expr
+   55     | . expr GE expr
+   56     | . expr PLUS expr
+   57     | . expr MINUS expr
+   58     | . expr STAR expr
+   59     | . expr DIV expr
+   60     | . expr MOD expr
+   61     | . NOT expr
+   62     | . MINUS expr
+   63     | . PLUS expr
+   64     | . NATURAL
+   65     | . DECIMAL
+   66     | . IDENTIFIER
+   67     | . funcinvocation
+   68     | . LPAR expr RPAR
+   69     | . LPAR error RPAR
 
-    SEMICOLON  shift, and go to state 76
+    MINUS       shift, and go to state 62
+    PLUS        shift, and go to state 63
+    LBRACE      shift, and go to state 71
+    LPAR        shift, and go to state 64
+    NOT         shift, and go to state 65
+    IDENTIFIER  shift, and go to state 66
+    NATURAL     shift, and go to state 67
+    DECIMAL     shift, and go to state 68
+
+    funcinvocation  go to state 69
+    expr            go to state 72
 
 
 state 52
 
-   37 statement: parseargs .
+   28 statement: IF . expr LBRACE statement2 RBRACE ELSE LBRACE statement2 RBRACE
+   29          | IF . expr LBRACE statement2 RBRACE
+   43 funcinvocation: . IDENTIFIER LPAR expr funcinvocation2 RPAR
+   44               | . IDENTIFIER LPAR RPAR
+   45               | . IDENTIFIER LPAR error RPAR
+   48 expr: . expr OR expr
+   49     | . expr AND expr
+   50     | . expr LT expr
+   51     | . expr GT expr
+   52     | . expr EQ expr
+   53     | . expr NE expr
+   54     | . expr LE expr
+   55     | . expr GE expr
+   56     | . expr PLUS expr
+   57     | . expr MINUS expr
+   58     | . expr STAR expr
+   59     | . expr DIV expr
+   60     | . expr MOD expr
+   61     | . NOT expr
+   62     | . MINUS expr
+   63     | . PLUS expr
+   64     | . NATURAL
+   65     | . DECIMAL
+   66     | . IDENTIFIER
+   67     | . funcinvocation
+   68     | . LPAR expr RPAR
+   69     | . LPAR error RPAR
 
-    $default  reduce using rule 37 (statement)
+    MINUS       shift, and go to state 62
+    PLUS        shift, and go to state 63
+    LPAR        shift, and go to state 64
+    NOT         shift, and go to state 65
+    IDENTIFIER  shift, and go to state 66
+    NATURAL     shift, and go to state 67
+    DECIMAL     shift, and go to state 68
+
+    funcinvocation  go to state 69
+    expr            go to state 73
 
 
 state 53
 
-   36 statement: funcinvocation .
+   36 statement: PRINT . LPAR expr RPAR
+   37          | PRINT . LPAR STRLIT RPAR
 
-    $default  reduce using rule 36 (statement)
+    LPAR  shift, and go to state 74
 
 
 state 54
 
-   21 parameters2: COMMA . IDENTIFIER type parameters2
+   26 statement: IDENTIFIER . ASSIGN expr
+   41 parseargs: IDENTIFIER . COMMA BLANKID ASSIGN PARSEINT LPAR CMDARGS LSQ expr RSQ RPAR
+   42          | IDENTIFIER . COMMA BLANKID ASSIGN PARSEINT LPAR error RPAR
+   43 funcinvocation: IDENTIFIER . LPAR expr funcinvocation2 RPAR
+   44               | IDENTIFIER . LPAR RPAR
+   45               | IDENTIFIER . LPAR error RPAR
 
-    IDENTIFIER  shift, and go to state 77
+    COMMA   shift, and go to state 75
+    ASSIGN  shift, and go to state 76
+    LPAR    shift, and go to state 77
 
 
 state 55
 
-   20 parameters: IDENTIFIER type parameters2 .
+   23 varsandstatements: varsandstatements vardeclaration . SEMICOLON
 
-    $default  reduce using rule 20 (parameters)
+    SEMICOLON  shift, and go to state 78
 
 
 state 56
 
-   18 funcheader2: type .
+   24 varsandstatements: varsandstatements statement . SEMICOLON
 
-    $default  reduce using rule 18 (funcheader2)
+    SEMICOLON  shift, and go to state 79
 
 
 state 57
 
-   15 funcheader: IDENTIFIER LPAR funcparams RPAR funcheader2 .
+   35 statement: parseargs .
 
-    $default  reduce using rule 15 (funcheader)
+    $default  reduce using rule 35 (statement)
 
 
 state 58
 
-   28 statement: . IDENTIFIER ASSIGN expr
-   29          | . LBRACE statement2 RBRACE
-   29          | LBRACE statement2 . RBRACE
-   30          | . IF expr LBRACE statement2 RBRACE ELSE LBRACE statement2 RBRACE
-   31          | . IF expr LBRACE statement2 RBRACE
-   32          | . FOR expr LBRACE statement2 RBRACE
-   33          | . FOR LBRACE statement2 RBRACE
-   34          | . RETURN expr
-   35          | . RETURN
-   36          | . funcinvocation
-   37          | . parseargs
-   38          | . PRINT LPAR expr RPAR
-   39          | . PRINT LPAR STRLIT RPAR
-   40          | . error
-   41 statement2: statement2 . statement SEMICOLON
-   43 parseargs: . IDENTIFIER COMMA BLANKID ASSIGN PARSEINT LPAR CMDARGS LSQ expr RSQ RPAR
-   44          | . IDENTIFIER COMMA BLANKID ASSIGN PARSEINT LPAR error RPAR
-   45 funcinvocation: . IDENTIFIER LPAR expr funcinvocation2 RPAR
-   46               | . IDENTIFIER LPAR RPAR
-   47               | . IDENTIFIER LPAR error RPAR
-
-    error       shift, and go to state 41
-    LBRACE      shift, and go to state 43
-    RBRACE      shift, and go to state 78
-    RETURN      shift, and go to state 45
-    FOR         shift, and go to state 46
-    IF          shift, and go to state 47
-    PRINT       shift, and go to state 48
-    IDENTIFIER  shift, and go to state 49
-
-    statement       go to state 79
-    parseargs       go to state 52
-    funcinvocation  go to state 53
-
-
-state 59
-
-   45 funcinvocation: . IDENTIFIER LPAR expr funcinvocation2 RPAR
-   46               | . IDENTIFIER LPAR RPAR
-   47               | . IDENTIFIER LPAR error RPAR
-   50 expr: . expr OR expr
-   51     | . expr AND expr
-   52     | . expr LT expr
-   53     | . expr GT expr
-   54     | . expr EQ expr
-   55     | . expr NE expr
-   56     | . expr LE expr
-   57     | . expr GE expr
-   58     | . expr PLUS expr
-   59     | . expr MINUS expr
-   60     | . expr STAR expr
-   61     | . expr DIV expr
-   62     | . expr MOD expr
-   63     | . NOT expr
-   64     | . MINUS expr
-   64     | MINUS . expr
-   65     | . PLUS expr
-   66     | . NATURAL
-   67     | . DECIMAL
-   68     | . IDENTIFIER
-   69     | . funcinvocation
-   70     | . LPAR expr RPAR
-   71     | . LPAR error RPAR
-
-    MINUS       shift, and go to state 59
-    PLUS        shift, and go to state 60
-    LPAR        shift, and go to state 61
-    NOT         shift, and go to state 62
-    IDENTIFIER  shift, and go to state 63
-    NATURAL     shift, and go to state 64
-    DECIMAL     shift, and go to state 65
-
-    funcinvocation  go to state 66
-    expr            go to state 80
-
-
-state 60
-
-   45 funcinvocation: . IDENTIFIER LPAR expr funcinvocation2 RPAR
-   46               | . IDENTIFIER LPAR RPAR
-   47               | . IDENTIFIER LPAR error RPAR
-   50 expr: . expr OR expr
-   51     | . expr AND expr
-   52     | . expr LT expr
-   53     | . expr GT expr
-   54     | . expr EQ expr
-   55     | . expr NE expr
-   56     | . expr LE expr
-   57     | . expr GE expr
-   58     | . expr PLUS expr
-   59     | . expr MINUS expr
-   60     | . expr STAR expr
-   61     | . expr DIV expr
-   62     | . expr MOD expr
-   63     | . NOT expr
-   64     | . MINUS expr
-   65     | . PLUS expr
-   65     | PLUS . expr
-   66     | . NATURAL
-   67     | . DECIMAL
-   68     | . IDENTIFIER
-   69     | . funcinvocation
-   70     | . LPAR expr RPAR
-   71     | . LPAR error RPAR
-
-    MINUS       shift, and go to state 59
-    PLUS        shift, and go to state 60
-    LPAR        shift, and go to state 61
-    NOT         shift, and go to state 62
-    IDENTIFIER  shift, and go to state 63
-    NATURAL     shift, and go to state 64
-    DECIMAL     shift, and go to state 65
-
-    funcinvocation  go to state 66
-    expr            go to state 81
-
-
-state 61
-
-   45 funcinvocation: . IDENTIFIER LPAR expr funcinvocation2 RPAR
-   46               | . IDENTIFIER LPAR RPAR
-   47               | . IDENTIFIER LPAR error RPAR
-   50 expr: . expr OR expr
-   51     | . expr AND expr
-   52     | . expr LT expr
-   53     | . expr GT expr
-   54     | . expr EQ expr
-   55     | . expr NE expr
-   56     | . expr LE expr
-   57     | . expr GE expr
-   58     | . expr PLUS expr
-   59     | . expr MINUS expr
-   60     | . expr STAR expr
-   61     | . expr DIV expr
-   62     | . expr MOD expr
-   63     | . NOT expr
-   64     | . MINUS expr
-   65     | . PLUS expr
-   66     | . NATURAL
-   67     | . DECIMAL
-   68     | . IDENTIFIER
-   69     | . funcinvocation
-   70     | . LPAR expr RPAR
-   70     | LPAR . expr RPAR
-   71     | . LPAR error RPAR
-   71     | LPAR . error RPAR
-
-    error       shift, and go to state 82
-    MINUS       shift, and go to state 59
-    PLUS        shift, and go to state 60
-    LPAR        shift, and go to state 61
-    NOT         shift, and go to state 62
-    IDENTIFIER  shift, and go to state 63
-    NATURAL     shift, and go to state 64
-    DECIMAL     shift, and go to state 65
-
-    funcinvocation  go to state 66
-    expr            go to state 83
-
-
-state 62
-
-   45 funcinvocation: . IDENTIFIER LPAR expr funcinvocation2 RPAR
-   46               | . IDENTIFIER LPAR RPAR
-   47               | . IDENTIFIER LPAR error RPAR
-   50 expr: . expr OR expr
-   51     | . expr AND expr
-   52     | . expr LT expr
-   53     | . expr GT expr
-   54     | . expr EQ expr
-   55     | . expr NE expr
-   56     | . expr LE expr
-   57     | . expr GE expr
-   58     | . expr PLUS expr
-   59     | . expr MINUS expr
-   60     | . expr STAR expr
-   61     | . expr DIV expr
-   62     | . expr MOD expr
-   63     | . NOT expr
-   63     | NOT . expr
-   64     | . MINUS expr
-   65     | . PLUS expr
-   66     | . NATURAL
-   67     | . DECIMAL
-   68     | . IDENTIFIER
-   69     | . funcinvocation
-   70     | . LPAR expr RPAR
-   71     | . LPAR error RPAR
-
-    MINUS       shift, and go to state 59
-    PLUS        shift, and go to state 60
-    LPAR        shift, and go to state 61
-    NOT         shift, and go to state 62
-    IDENTIFIER  shift, and go to state 63
-    NATURAL     shift, and go to state 64
-    DECIMAL     shift, and go to state 65
-
-    funcinvocation  go to state 66
-    expr            go to state 84
-
-
-state 63
-
-   45 funcinvocation: IDENTIFIER . LPAR expr funcinvocation2 RPAR
-   46               | IDENTIFIER . LPAR RPAR
-   47               | IDENTIFIER . LPAR error RPAR
-   68 expr: IDENTIFIER .  [SEMICOLON, COMMA, STAR, DIV, MINUS, PLUS, EQ, GE, GT, LBRACE, LE, LT, MOD, NE, AND, OR, RPAR, RSQ]
-
-    LPAR  shift, and go to state 74
-
-    $default  reduce using rule 68 (expr)
-
-
-state 64
-
-   66 expr: NATURAL .
-
-    $default  reduce using rule 66 (expr)
-
-
-state 65
-
-   67 expr: DECIMAL .
-
-    $default  reduce using rule 67 (expr)
-
-
-state 66
-
-   69 expr: funcinvocation .
-
-    $default  reduce using rule 69 (expr)
-
-
-state 67
-
-   34 statement: RETURN expr .  [SEMICOLON]
-   50 expr: expr . OR expr
-   51     | expr . AND expr
-   52     | expr . LT expr
-   53     | expr . GT expr
-   54     | expr . EQ expr
-   55     | expr . NE expr
-   56     | expr . LE expr
-   57     | expr . GE expr
-   58     | expr . PLUS expr
-   59     | expr . MINUS expr
-   60     | expr . STAR expr
-   61     | expr . DIV expr
-   62     | expr . MOD expr
-
-    STAR   shift, and go to state 85
-    DIV    shift, and go to state 86
-    MINUS  shift, and go to state 87
-    PLUS   shift, and go to state 88
-    EQ     shift, and go to state 89
-    GE     shift, and go to state 90
-    GT     shift, and go to state 91
-    LE     shift, and go to state 92
-    LT     shift, and go to state 93
-    MOD    shift, and go to state 94
-    NE     shift, and go to state 95
-    AND    shift, and go to state 96
-    OR     shift, and go to state 97
+   34 statement: funcinvocation .
 
     $default  reduce using rule 34 (statement)
 
 
-state 68
-
-   33 statement: FOR LBRACE . statement2 RBRACE
-   41 statement2: . statement2 statement SEMICOLON
-   42           | .
-
-    $default  reduce using rule 42 (statement2)
-
-    statement2  go to state 98
-
-
-state 69
-
-   32 statement: FOR expr . LBRACE statement2 RBRACE
-   50 expr: expr . OR expr
-   51     | expr . AND expr
-   52     | expr . LT expr
-   53     | expr . GT expr
-   54     | expr . EQ expr
-   55     | expr . NE expr
-   56     | expr . LE expr
-   57     | expr . GE expr
-   58     | expr . PLUS expr
-   59     | expr . MINUS expr
-   60     | expr . STAR expr
-   61     | expr . DIV expr
-   62     | expr . MOD expr
-
-    STAR    shift, and go to state 85
-    DIV     shift, and go to state 86
-    MINUS   shift, and go to state 87
-    PLUS    shift, and go to state 88
-    EQ      shift, and go to state 89
-    GE      shift, and go to state 90
-    GT      shift, and go to state 91
-    LBRACE  shift, and go to state 99
-    LE      shift, and go to state 92
-    LT      shift, and go to state 93
-    MOD     shift, and go to state 94
-    NE      shift, and go to state 95
-    AND     shift, and go to state 96
-    OR      shift, and go to state 97
-
-
-state 70
-
-   30 statement: IF expr . LBRACE statement2 RBRACE ELSE LBRACE statement2 RBRACE
-   31          | IF expr . LBRACE statement2 RBRACE
-   50 expr: expr . OR expr
-   51     | expr . AND expr
-   52     | expr . LT expr
-   53     | expr . GT expr
-   54     | expr . EQ expr
-   55     | expr . NE expr
-   56     | expr . LE expr
-   57     | expr . GE expr
-   58     | expr . PLUS expr
-   59     | expr . MINUS expr
-   60     | expr . STAR expr
-   61     | expr . DIV expr
-   62     | expr . MOD expr
-
-    STAR    shift, and go to state 85
-    DIV     shift, and go to state 86
-    MINUS   shift, and go to state 87
-    PLUS    shift, and go to state 88
-    EQ      shift, and go to state 89
-    GE      shift, and go to state 90
-    GT      shift, and go to state 91
-    LBRACE  shift, and go to state 100
-    LE      shift, and go to state 92
-    LT      shift, and go to state 93
-    MOD     shift, and go to state 94
-    NE      shift, and go to state 95
-    AND     shift, and go to state 96
-    OR      shift, and go to state 97
-
-
-state 71
-
-   38 statement: PRINT LPAR . expr RPAR
-   39          | PRINT LPAR . STRLIT RPAR
-   45 funcinvocation: . IDENTIFIER LPAR expr funcinvocation2 RPAR
-   46               | . IDENTIFIER LPAR RPAR
-   47               | . IDENTIFIER LPAR error RPAR
-   50 expr: . expr OR expr
-   51     | . expr AND expr
-   52     | . expr LT expr
-   53     | . expr GT expr
-   54     | . expr EQ expr
-   55     | . expr NE expr
-   56     | . expr LE expr
-   57     | . expr GE expr
-   58     | . expr PLUS expr
-   59     | . expr MINUS expr
-   60     | . expr STAR expr
-   61     | . expr DIV expr
-   62     | . expr MOD expr
-   63     | . NOT expr
-   64     | . MINUS expr
-   65     | . PLUS expr
-   66     | . NATURAL
-   67     | . DECIMAL
-   68     | . IDENTIFIER
-   69     | . funcinvocation
-   70     | . LPAR expr RPAR
-   71     | . LPAR error RPAR
-
-    MINUS       shift, and go to state 59
-    PLUS        shift, and go to state 60
-    LPAR        shift, and go to state 61
-    NOT         shift, and go to state 62
-    IDENTIFIER  shift, and go to state 63
-    NATURAL     shift, and go to state 64
-    DECIMAL     shift, and go to state 65
-    STRLIT      shift, and go to state 101
-
-    funcinvocation  go to state 66
-    expr            go to state 102
-
-
-state 72
-
-   43 parseargs: IDENTIFIER COMMA . BLANKID ASSIGN PARSEINT LPAR CMDARGS LSQ expr RSQ RPAR
-   44          | IDENTIFIER COMMA . BLANKID ASSIGN PARSEINT LPAR error RPAR
-
-    BLANKID  shift, and go to state 103
-
-
-state 73
-
-   28 statement: IDENTIFIER ASSIGN . expr
-   45 funcinvocation: . IDENTIFIER LPAR expr funcinvocation2 RPAR
-   46               | . IDENTIFIER LPAR RPAR
-   47               | . IDENTIFIER LPAR error RPAR
-   50 expr: . expr OR expr
-   51     | . expr AND expr
-   52     | . expr LT expr
-   53     | . expr GT expr
-   54     | . expr EQ expr
-   55     | . expr NE expr
-   56     | . expr LE expr
-   57     | . expr GE expr
-   58     | . expr PLUS expr
-   59     | . expr MINUS expr
-   60     | . expr STAR expr
-   61     | . expr DIV expr
-   62     | . expr MOD expr
-   63     | . NOT expr
-   64     | . MINUS expr
-   65     | . PLUS expr
-   66     | . NATURAL
-   67     | . DECIMAL
-   68     | . IDENTIFIER
-   69     | . funcinvocation
-   70     | . LPAR expr RPAR
-   71     | . LPAR error RPAR
-
-    MINUS       shift, and go to state 59
-    PLUS        shift, and go to state 60
-    LPAR        shift, and go to state 61
-    NOT         shift, and go to state 62
-    IDENTIFIER  shift, and go to state 63
-    NATURAL     shift, and go to state 64
-    DECIMAL     shift, and go to state 65
-
-    funcinvocation  go to state 66
-    expr            go to state 104
-
-
-state 74
-
-   45 funcinvocation: . IDENTIFIER LPAR expr funcinvocation2 RPAR
-   45               | IDENTIFIER LPAR . expr funcinvocation2 RPAR
-   46               | . IDENTIFIER LPAR RPAR
-   46               | IDENTIFIER LPAR . RPAR
-   47               | . IDENTIFIER LPAR error RPAR
-   47               | IDENTIFIER LPAR . error RPAR
-   50 expr: . expr OR expr
-   51     | . expr AND expr
-   52     | . expr LT expr
-   53     | . expr GT expr
-   54     | . expr EQ expr
-   55     | . expr NE expr
-   56     | . expr LE expr
-   57     | . expr GE expr
-   58     | . expr PLUS expr
-   59     | . expr MINUS expr
-   60     | . expr STAR expr
-   61     | . expr DIV expr
-   62     | . expr MOD expr
-   63     | . NOT expr
-   64     | . MINUS expr
-   65     | . PLUS expr
-   66     | . NATURAL
-   67     | . DECIMAL
-   68     | . IDENTIFIER
-   69     | . funcinvocation
-   70     | . LPAR expr RPAR
-   71     | . LPAR error RPAR
-
-    error       shift, and go to state 105
-    MINUS       shift, and go to state 59
-    PLUS        shift, and go to state 60
-    LPAR        shift, and go to state 61
-    NOT         shift, and go to state 62
-    RPAR        shift, and go to state 106
-    IDENTIFIER  shift, and go to state 63
-    NATURAL     shift, and go to state 64
-    DECIMAL     shift, and go to state 65
-
-    funcinvocation  go to state 66
-    expr            go to state 107
-
-
-state 75
-
-   25 varsandstatements: varsandstatements vardeclaration SEMICOLON .
-
-    $default  reduce using rule 25 (varsandstatements)
-
-
-state 76
-
-   26 varsandstatements: varsandstatements statement SEMICOLON .
-
-    $default  reduce using rule 26 (varsandstatements)
-
-
-state 77
+state 59
 
    10 type: . INT
    11     | . FLOAT32
    12     | . BOOL
    13     | . STRING
-   21 parameters2: COMMA IDENTIFIER . type parameters2
+   19 parameters2: COMMA IDENTIFIER . type parameters2
 
-    INT      shift, and go to state 28
-    FLOAT32  shift, and go to state 29
-    BOOL     shift, and go to state 30
-    STRING   shift, and go to state 31
+    INT      shift, and go to state 25
+    FLOAT32  shift, and go to state 26
+    BOOL     shift, and go to state 27
+    STRING   shift, and go to state 28
 
-    type  go to state 108
+    type  go to state 80
+
+
+state 60
+
+   14 funcdeclaration: FUNC IDENTIFIER LPAR parameters RPAR type funcbody .
+
+    $default  reduce using rule 14 (funcdeclaration)
+
+
+state 61
+
+   26 statement: . IDENTIFIER ASSIGN expr
+   27          | . LBRACE statement2 RBRACE
+   27          | LBRACE statement2 . RBRACE
+   28          | . IF expr LBRACE statement2 RBRACE ELSE LBRACE statement2 RBRACE
+   29          | . IF expr LBRACE statement2 RBRACE
+   30          | . FOR expr LBRACE statement2 RBRACE
+   31          | . FOR LBRACE statement2 RBRACE
+   32          | . RETURN expr
+   33          | . RETURN
+   34          | . funcinvocation
+   35          | . parseargs
+   36          | . PRINT LPAR expr RPAR
+   37          | . PRINT LPAR STRLIT RPAR
+   38          | . error
+   39 statement2: statement2 . statement SEMICOLON
+   41 parseargs: . IDENTIFIER COMMA BLANKID ASSIGN PARSEINT LPAR CMDARGS LSQ expr RSQ RPAR
+   42          | . IDENTIFIER COMMA BLANKID ASSIGN PARSEINT LPAR error RPAR
+   43 funcinvocation: . IDENTIFIER LPAR expr funcinvocation2 RPAR
+   44               | . IDENTIFIER LPAR RPAR
+   45               | . IDENTIFIER LPAR error RPAR
+
+    error       shift, and go to state 46
+    LBRACE      shift, and go to state 48
+    RBRACE      shift, and go to state 81
+    RETURN      shift, and go to state 50
+    FOR         shift, and go to state 51
+    IF          shift, and go to state 52
+    PRINT       shift, and go to state 53
+    IDENTIFIER  shift, and go to state 54
+
+    statement       go to state 82
+    parseargs       go to state 57
+    funcinvocation  go to state 58
+
+
+state 62
+
+   43 funcinvocation: . IDENTIFIER LPAR expr funcinvocation2 RPAR
+   44               | . IDENTIFIER LPAR RPAR
+   45               | . IDENTIFIER LPAR error RPAR
+   48 expr: . expr OR expr
+   49     | . expr AND expr
+   50     | . expr LT expr
+   51     | . expr GT expr
+   52     | . expr EQ expr
+   53     | . expr NE expr
+   54     | . expr LE expr
+   55     | . expr GE expr
+   56     | . expr PLUS expr
+   57     | . expr MINUS expr
+   58     | . expr STAR expr
+   59     | . expr DIV expr
+   60     | . expr MOD expr
+   61     | . NOT expr
+   62     | . MINUS expr
+   62     | MINUS . expr
+   63     | . PLUS expr
+   64     | . NATURAL
+   65     | . DECIMAL
+   66     | . IDENTIFIER
+   67     | . funcinvocation
+   68     | . LPAR expr RPAR
+   69     | . LPAR error RPAR
+
+    MINUS       shift, and go to state 62
+    PLUS        shift, and go to state 63
+    LPAR        shift, and go to state 64
+    NOT         shift, and go to state 65
+    IDENTIFIER  shift, and go to state 66
+    NATURAL     shift, and go to state 67
+    DECIMAL     shift, and go to state 68
+
+    funcinvocation  go to state 69
+    expr            go to state 83
+
+
+state 63
+
+   43 funcinvocation: . IDENTIFIER LPAR expr funcinvocation2 RPAR
+   44               | . IDENTIFIER LPAR RPAR
+   45               | . IDENTIFIER LPAR error RPAR
+   48 expr: . expr OR expr
+   49     | . expr AND expr
+   50     | . expr LT expr
+   51     | . expr GT expr
+   52     | . expr EQ expr
+   53     | . expr NE expr
+   54     | . expr LE expr
+   55     | . expr GE expr
+   56     | . expr PLUS expr
+   57     | . expr MINUS expr
+   58     | . expr STAR expr
+   59     | . expr DIV expr
+   60     | . expr MOD expr
+   61     | . NOT expr
+   62     | . MINUS expr
+   63     | . PLUS expr
+   63     | PLUS . expr
+   64     | . NATURAL
+   65     | . DECIMAL
+   66     | . IDENTIFIER
+   67     | . funcinvocation
+   68     | . LPAR expr RPAR
+   69     | . LPAR error RPAR
+
+    MINUS       shift, and go to state 62
+    PLUS        shift, and go to state 63
+    LPAR        shift, and go to state 64
+    NOT         shift, and go to state 65
+    IDENTIFIER  shift, and go to state 66
+    NATURAL     shift, and go to state 67
+    DECIMAL     shift, and go to state 68
+
+    funcinvocation  go to state 69
+    expr            go to state 84
+
+
+state 64
+
+   43 funcinvocation: . IDENTIFIER LPAR expr funcinvocation2 RPAR
+   44               | . IDENTIFIER LPAR RPAR
+   45               | . IDENTIFIER LPAR error RPAR
+   48 expr: . expr OR expr
+   49     | . expr AND expr
+   50     | . expr LT expr
+   51     | . expr GT expr
+   52     | . expr EQ expr
+   53     | . expr NE expr
+   54     | . expr LE expr
+   55     | . expr GE expr
+   56     | . expr PLUS expr
+   57     | . expr MINUS expr
+   58     | . expr STAR expr
+   59     | . expr DIV expr
+   60     | . expr MOD expr
+   61     | . NOT expr
+   62     | . MINUS expr
+   63     | . PLUS expr
+   64     | . NATURAL
+   65     | . DECIMAL
+   66     | . IDENTIFIER
+   67     | . funcinvocation
+   68     | . LPAR expr RPAR
+   68     | LPAR . expr RPAR
+   69     | . LPAR error RPAR
+   69     | LPAR . error RPAR
+
+    error       shift, and go to state 85
+    MINUS       shift, and go to state 62
+    PLUS        shift, and go to state 63
+    LPAR        shift, and go to state 64
+    NOT         shift, and go to state 65
+    IDENTIFIER  shift, and go to state 66
+    NATURAL     shift, and go to state 67
+    DECIMAL     shift, and go to state 68
+
+    funcinvocation  go to state 69
+    expr            go to state 86
+
+
+state 65
+
+   43 funcinvocation: . IDENTIFIER LPAR expr funcinvocation2 RPAR
+   44               | . IDENTIFIER LPAR RPAR
+   45               | . IDENTIFIER LPAR error RPAR
+   48 expr: . expr OR expr
+   49     | . expr AND expr
+   50     | . expr LT expr
+   51     | . expr GT expr
+   52     | . expr EQ expr
+   53     | . expr NE expr
+   54     | . expr LE expr
+   55     | . expr GE expr
+   56     | . expr PLUS expr
+   57     | . expr MINUS expr
+   58     | . expr STAR expr
+   59     | . expr DIV expr
+   60     | . expr MOD expr
+   61     | . NOT expr
+   61     | NOT . expr
+   62     | . MINUS expr
+   63     | . PLUS expr
+   64     | . NATURAL
+   65     | . DECIMAL
+   66     | . IDENTIFIER
+   67     | . funcinvocation
+   68     | . LPAR expr RPAR
+   69     | . LPAR error RPAR
+
+    MINUS       shift, and go to state 62
+    PLUS        shift, and go to state 63
+    LPAR        shift, and go to state 64
+    NOT         shift, and go to state 65
+    IDENTIFIER  shift, and go to state 66
+    NATURAL     shift, and go to state 67
+    DECIMAL     shift, and go to state 68
+
+    funcinvocation  go to state 69
+    expr            go to state 87
+
+
+state 66
+
+   43 funcinvocation: IDENTIFIER . LPAR expr funcinvocation2 RPAR
+   44               | IDENTIFIER . LPAR RPAR
+   45               | IDENTIFIER . LPAR error RPAR
+   66 expr: IDENTIFIER .  [SEMICOLON, COMMA, STAR, DIV, MINUS, PLUS, EQ, GE, GT, LBRACE, LE, LT, MOD, NE, AND, OR, RPAR, RSQ]
+
+    LPAR  shift, and go to state 77
+
+    $default  reduce using rule 66 (expr)
+
+
+state 67
+
+   64 expr: NATURAL .
+
+    $default  reduce using rule 64 (expr)
+
+
+state 68
+
+   65 expr: DECIMAL .
+
+    $default  reduce using rule 65 (expr)
+
+
+state 69
+
+   67 expr: funcinvocation .
+
+    $default  reduce using rule 67 (expr)
+
+
+state 70
+
+   32 statement: RETURN expr .  [SEMICOLON]
+   48 expr: expr . OR expr
+   49     | expr . AND expr
+   50     | expr . LT expr
+   51     | expr . GT expr
+   52     | expr . EQ expr
+   53     | expr . NE expr
+   54     | expr . LE expr
+   55     | expr . GE expr
+   56     | expr . PLUS expr
+   57     | expr . MINUS expr
+   58     | expr . STAR expr
+   59     | expr . DIV expr
+   60     | expr . MOD expr
+
+    STAR   shift, and go to state 88
+    DIV    shift, and go to state 89
+    MINUS  shift, and go to state 90
+    PLUS   shift, and go to state 91
+    EQ     shift, and go to state 92
+    GE     shift, and go to state 93
+    GT     shift, and go to state 94
+    LE     shift, and go to state 95
+    LT     shift, and go to state 96
+    MOD    shift, and go to state 97
+    NE     shift, and go to state 98
+    AND    shift, and go to state 99
+    OR     shift, and go to state 100
+
+    $default  reduce using rule 32 (statement)
+
+
+state 71
+
+   31 statement: FOR LBRACE . statement2 RBRACE
+   39 statement2: . statement2 statement SEMICOLON
+   40           | .
+
+    $default  reduce using rule 40 (statement2)
+
+    statement2  go to state 101
+
+
+state 72
+
+   30 statement: FOR expr . LBRACE statement2 RBRACE
+   48 expr: expr . OR expr
+   49     | expr . AND expr
+   50     | expr . LT expr
+   51     | expr . GT expr
+   52     | expr . EQ expr
+   53     | expr . NE expr
+   54     | expr . LE expr
+   55     | expr . GE expr
+   56     | expr . PLUS expr
+   57     | expr . MINUS expr
+   58     | expr . STAR expr
+   59     | expr . DIV expr
+   60     | expr . MOD expr
+
+    STAR    shift, and go to state 88
+    DIV     shift, and go to state 89
+    MINUS   shift, and go to state 90
+    PLUS    shift, and go to state 91
+    EQ      shift, and go to state 92
+    GE      shift, and go to state 93
+    GT      shift, and go to state 94
+    LBRACE  shift, and go to state 102
+    LE      shift, and go to state 95
+    LT      shift, and go to state 96
+    MOD     shift, and go to state 97
+    NE      shift, and go to state 98
+    AND     shift, and go to state 99
+    OR      shift, and go to state 100
+
+
+state 73
+
+   28 statement: IF expr . LBRACE statement2 RBRACE ELSE LBRACE statement2 RBRACE
+   29          | IF expr . LBRACE statement2 RBRACE
+   48 expr: expr . OR expr
+   49     | expr . AND expr
+   50     | expr . LT expr
+   51     | expr . GT expr
+   52     | expr . EQ expr
+   53     | expr . NE expr
+   54     | expr . LE expr
+   55     | expr . GE expr
+   56     | expr . PLUS expr
+   57     | expr . MINUS expr
+   58     | expr . STAR expr
+   59     | expr . DIV expr
+   60     | expr . MOD expr
+
+    STAR    shift, and go to state 88
+    DIV     shift, and go to state 89
+    MINUS   shift, and go to state 90
+    PLUS    shift, and go to state 91
+    EQ      shift, and go to state 92
+    GE      shift, and go to state 93
+    GT      shift, and go to state 94
+    LBRACE  shift, and go to state 103
+    LE      shift, and go to state 95
+    LT      shift, and go to state 96
+    MOD     shift, and go to state 97
+    NE      shift, and go to state 98
+    AND     shift, and go to state 99
+    OR      shift, and go to state 100
+
+
+state 74
+
+   36 statement: PRINT LPAR . expr RPAR
+   37          | PRINT LPAR . STRLIT RPAR
+   43 funcinvocation: . IDENTIFIER LPAR expr funcinvocation2 RPAR
+   44               | . IDENTIFIER LPAR RPAR
+   45               | . IDENTIFIER LPAR error RPAR
+   48 expr: . expr OR expr
+   49     | . expr AND expr
+   50     | . expr LT expr
+   51     | . expr GT expr
+   52     | . expr EQ expr
+   53     | . expr NE expr
+   54     | . expr LE expr
+   55     | . expr GE expr
+   56     | . expr PLUS expr
+   57     | . expr MINUS expr
+   58     | . expr STAR expr
+   59     | . expr DIV expr
+   60     | . expr MOD expr
+   61     | . NOT expr
+   62     | . MINUS expr
+   63     | . PLUS expr
+   64     | . NATURAL
+   65     | . DECIMAL
+   66     | . IDENTIFIER
+   67     | . funcinvocation
+   68     | . LPAR expr RPAR
+   69     | . LPAR error RPAR
+
+    MINUS       shift, and go to state 62
+    PLUS        shift, and go to state 63
+    LPAR        shift, and go to state 64
+    NOT         shift, and go to state 65
+    IDENTIFIER  shift, and go to state 66
+    NATURAL     shift, and go to state 67
+    DECIMAL     shift, and go to state 68
+    STRLIT      shift, and go to state 104
+
+    funcinvocation  go to state 69
+    expr            go to state 105
+
+
+state 75
+
+   41 parseargs: IDENTIFIER COMMA . BLANKID ASSIGN PARSEINT LPAR CMDARGS LSQ expr RSQ RPAR
+   42          | IDENTIFIER COMMA . BLANKID ASSIGN PARSEINT LPAR error RPAR
+
+    BLANKID  shift, and go to state 106
+
+
+state 76
+
+   26 statement: IDENTIFIER ASSIGN . expr
+   43 funcinvocation: . IDENTIFIER LPAR expr funcinvocation2 RPAR
+   44               | . IDENTIFIER LPAR RPAR
+   45               | . IDENTIFIER LPAR error RPAR
+   48 expr: . expr OR expr
+   49     | . expr AND expr
+   50     | . expr LT expr
+   51     | . expr GT expr
+   52     | . expr EQ expr
+   53     | . expr NE expr
+   54     | . expr LE expr
+   55     | . expr GE expr
+   56     | . expr PLUS expr
+   57     | . expr MINUS expr
+   58     | . expr STAR expr
+   59     | . expr DIV expr
+   60     | . expr MOD expr
+   61     | . NOT expr
+   62     | . MINUS expr
+   63     | . PLUS expr
+   64     | . NATURAL
+   65     | . DECIMAL
+   66     | . IDENTIFIER
+   67     | . funcinvocation
+   68     | . LPAR expr RPAR
+   69     | . LPAR error RPAR
+
+    MINUS       shift, and go to state 62
+    PLUS        shift, and go to state 63
+    LPAR        shift, and go to state 64
+    NOT         shift, and go to state 65
+    IDENTIFIER  shift, and go to state 66
+    NATURAL     shift, and go to state 67
+    DECIMAL     shift, and go to state 68
+
+    funcinvocation  go to state 69
+    expr            go to state 107
+
+
+state 77
+
+   43 funcinvocation: . IDENTIFIER LPAR expr funcinvocation2 RPAR
+   43               | IDENTIFIER LPAR . expr funcinvocation2 RPAR
+   44               | . IDENTIFIER LPAR RPAR
+   44               | IDENTIFIER LPAR . RPAR
+   45               | . IDENTIFIER LPAR error RPAR
+   45               | IDENTIFIER LPAR . error RPAR
+   48 expr: . expr OR expr
+   49     | . expr AND expr
+   50     | . expr LT expr
+   51     | . expr GT expr
+   52     | . expr EQ expr
+   53     | . expr NE expr
+   54     | . expr LE expr
+   55     | . expr GE expr
+   56     | . expr PLUS expr
+   57     | . expr MINUS expr
+   58     | . expr STAR expr
+   59     | . expr DIV expr
+   60     | . expr MOD expr
+   61     | . NOT expr
+   62     | . MINUS expr
+   63     | . PLUS expr
+   64     | . NATURAL
+   65     | . DECIMAL
+   66     | . IDENTIFIER
+   67     | . funcinvocation
+   68     | . LPAR expr RPAR
+   69     | . LPAR error RPAR
+
+    error       shift, and go to state 108
+    MINUS       shift, and go to state 62
+    PLUS        shift, and go to state 63
+    LPAR        shift, and go to state 64
+    NOT         shift, and go to state 65
+    RPAR        shift, and go to state 109
+    IDENTIFIER  shift, and go to state 66
+    NATURAL     shift, and go to state 67
+    DECIMAL     shift, and go to state 68
+
+    funcinvocation  go to state 69
+    expr            go to state 110
 
 
 state 78
 
-   29 statement: LBRACE statement2 RBRACE .
+   23 varsandstatements: varsandstatements vardeclaration SEMICOLON .
 
-    $default  reduce using rule 29 (statement)
+    $default  reduce using rule 23 (varsandstatements)
 
 
 state 79
 
-   41 statement2: statement2 statement . SEMICOLON
+   24 varsandstatements: varsandstatements statement SEMICOLON .
 
-    SEMICOLON  shift, and go to state 109
+    $default  reduce using rule 24 (varsandstatements)
 
 
 state 80
 
-   50 expr: expr . OR expr
-   51     | expr . AND expr
-   52     | expr . LT expr
-   53     | expr . GT expr
-   54     | expr . EQ expr
-   55     | expr . NE expr
-   56     | expr . LE expr
-   57     | expr . GE expr
-   58     | expr . PLUS expr
-   59     | expr . MINUS expr
-   60     | expr . STAR expr
-   61     | expr . DIV expr
-   62     | expr . MOD expr
-   64     | MINUS expr .  [SEMICOLON, COMMA, MINUS, PLUS, EQ, GE, GT, LBRACE, LE, LT, NE, AND, OR, RPAR, RSQ]
+   19 parameters2: . COMMA IDENTIFIER type parameters2
+   19            | COMMA IDENTIFIER type . parameters2
+   20            | .  [RPAR]
 
-    STAR  shift, and go to state 85
-    DIV   shift, and go to state 86
-    MOD   shift, and go to state 94
+    COMMA  shift, and go to state 42
 
-    $default  reduce using rule 64 (expr)
+    $default  reduce using rule 20 (parameters2)
 
-    Conflict between rule 64 and token STAR resolved as shift (MINUS < STAR).
-    Conflict between rule 64 and token DIV resolved as shift (MINUS < DIV).
-    Conflict between rule 64 and token MINUS resolved as reduce (%left MINUS).
-    Conflict between rule 64 and token PLUS resolved as reduce (%left PLUS).
-    Conflict between rule 64 and token EQ resolved as reduce (EQ < MINUS).
-    Conflict between rule 64 and token GE resolved as reduce (GE < MINUS).
-    Conflict between rule 64 and token GT resolved as reduce (GT < MINUS).
-    Conflict between rule 64 and token LE resolved as reduce (LE < MINUS).
-    Conflict between rule 64 and token LT resolved as reduce (LT < MINUS).
-    Conflict between rule 64 and token MOD resolved as shift (MINUS < MOD).
-    Conflict between rule 64 and token NE resolved as reduce (NE < MINUS).
-    Conflict between rule 64 and token AND resolved as reduce (AND < MINUS).
-    Conflict between rule 64 and token OR resolved as reduce (OR < MINUS).
+    parameters2  go to state 111
 
 
 state 81
 
-   50 expr: expr . OR expr
-   51     | expr . AND expr
-   52     | expr . LT expr
-   53     | expr . GT expr
-   54     | expr . EQ expr
-   55     | expr . NE expr
-   56     | expr . LE expr
-   57     | expr . GE expr
-   58     | expr . PLUS expr
-   59     | expr . MINUS expr
-   60     | expr . STAR expr
-   61     | expr . DIV expr
-   62     | expr . MOD expr
-   65     | PLUS expr .  [SEMICOLON, COMMA, MINUS, PLUS, EQ, GE, GT, LBRACE, LE, LT, NE, AND, OR, RPAR, RSQ]
+   27 statement: LBRACE statement2 RBRACE .
 
-    STAR  shift, and go to state 85
-    DIV   shift, and go to state 86
-    MOD   shift, and go to state 94
-
-    $default  reduce using rule 65 (expr)
-
-    Conflict between rule 65 and token STAR resolved as shift (PLUS < STAR).
-    Conflict between rule 65 and token DIV resolved as shift (PLUS < DIV).
-    Conflict between rule 65 and token MINUS resolved as reduce (%left MINUS).
-    Conflict between rule 65 and token PLUS resolved as reduce (%left PLUS).
-    Conflict between rule 65 and token EQ resolved as reduce (EQ < PLUS).
-    Conflict between rule 65 and token GE resolved as reduce (GE < PLUS).
-    Conflict between rule 65 and token GT resolved as reduce (GT < PLUS).
-    Conflict between rule 65 and token LE resolved as reduce (LE < PLUS).
-    Conflict between rule 65 and token LT resolved as reduce (LT < PLUS).
-    Conflict between rule 65 and token MOD resolved as shift (PLUS < MOD).
-    Conflict between rule 65 and token NE resolved as reduce (NE < PLUS).
-    Conflict between rule 65 and token AND resolved as reduce (AND < PLUS).
-    Conflict between rule 65 and token OR resolved as reduce (OR < PLUS).
+    $default  reduce using rule 27 (statement)
 
 
 state 82
 
-   71 expr: LPAR error . RPAR
+   39 statement2: statement2 statement . SEMICOLON
 
-    RPAR  shift, and go to state 110
+    SEMICOLON  shift, and go to state 112
 
 
 state 83
 
-   50 expr: expr . OR expr
-   51     | expr . AND expr
-   52     | expr . LT expr
-   53     | expr . GT expr
-   54     | expr . EQ expr
-   55     | expr . NE expr
-   56     | expr . LE expr
-   57     | expr . GE expr
-   58     | expr . PLUS expr
-   59     | expr . MINUS expr
-   60     | expr . STAR expr
-   61     | expr . DIV expr
-   62     | expr . MOD expr
-   70     | LPAR expr . RPAR
+   48 expr: expr . OR expr
+   49     | expr . AND expr
+   50     | expr . LT expr
+   51     | expr . GT expr
+   52     | expr . EQ expr
+   53     | expr . NE expr
+   54     | expr . LE expr
+   55     | expr . GE expr
+   56     | expr . PLUS expr
+   57     | expr . MINUS expr
+   58     | expr . STAR expr
+   59     | expr . DIV expr
+   60     | expr . MOD expr
+   62     | MINUS expr .  [SEMICOLON, COMMA, MINUS, PLUS, EQ, GE, GT, LBRACE, LE, LT, NE, AND, OR, RPAR, RSQ]
 
-    STAR   shift, and go to state 85
-    DIV    shift, and go to state 86
-    MINUS  shift, and go to state 87
-    PLUS   shift, and go to state 88
-    EQ     shift, and go to state 89
-    GE     shift, and go to state 90
-    GT     shift, and go to state 91
-    LE     shift, and go to state 92
-    LT     shift, and go to state 93
-    MOD    shift, and go to state 94
-    NE     shift, and go to state 95
-    AND    shift, and go to state 96
-    OR     shift, and go to state 97
-    RPAR   shift, and go to state 111
+    STAR  shift, and go to state 88
+    DIV   shift, and go to state 89
+    MOD   shift, and go to state 97
+
+    $default  reduce using rule 62 (expr)
+
+    Conflict between rule 62 and token STAR resolved as shift (MINUS < STAR).
+    Conflict between rule 62 and token DIV resolved as shift (MINUS < DIV).
+    Conflict between rule 62 and token MINUS resolved as reduce (%left MINUS).
+    Conflict between rule 62 and token PLUS resolved as reduce (%left PLUS).
+    Conflict between rule 62 and token EQ resolved as reduce (EQ < MINUS).
+    Conflict between rule 62 and token GE resolved as reduce (GE < MINUS).
+    Conflict between rule 62 and token GT resolved as reduce (GT < MINUS).
+    Conflict between rule 62 and token LE resolved as reduce (LE < MINUS).
+    Conflict between rule 62 and token LT resolved as reduce (LT < MINUS).
+    Conflict between rule 62 and token MOD resolved as shift (MINUS < MOD).
+    Conflict between rule 62 and token NE resolved as reduce (NE < MINUS).
+    Conflict between rule 62 and token AND resolved as reduce (AND < MINUS).
+    Conflict between rule 62 and token OR resolved as reduce (OR < MINUS).
 
 
 state 84
 
-   50 expr: expr . OR expr
-   51     | expr . AND expr
-   52     | expr . LT expr
-   53     | expr . GT expr
-   54     | expr . EQ expr
-   55     | expr . NE expr
-   56     | expr . LE expr
-   57     | expr . GE expr
-   58     | expr . PLUS expr
-   59     | expr . MINUS expr
-   60     | expr . STAR expr
-   61     | expr . DIV expr
-   62     | expr . MOD expr
-   63     | NOT expr .  [SEMICOLON, COMMA, LBRACE, AND, OR, RPAR, RSQ]
+   48 expr: expr . OR expr
+   49     | expr . AND expr
+   50     | expr . LT expr
+   51     | expr . GT expr
+   52     | expr . EQ expr
+   53     | expr . NE expr
+   54     | expr . LE expr
+   55     | expr . GE expr
+   56     | expr . PLUS expr
+   57     | expr . MINUS expr
+   58     | expr . STAR expr
+   59     | expr . DIV expr
+   60     | expr . MOD expr
+   63     | PLUS expr .  [SEMICOLON, COMMA, MINUS, PLUS, EQ, GE, GT, LBRACE, LE, LT, NE, AND, OR, RPAR, RSQ]
 
-    STAR   shift, and go to state 85
-    DIV    shift, and go to state 86
-    MINUS  shift, and go to state 87
-    PLUS   shift, and go to state 88
-    EQ     shift, and go to state 89
-    GE     shift, and go to state 90
-    GT     shift, and go to state 91
-    LE     shift, and go to state 92
-    LT     shift, and go to state 93
-    MOD    shift, and go to state 94
-    NE     shift, and go to state 95
+    STAR  shift, and go to state 88
+    DIV   shift, and go to state 89
+    MOD   shift, and go to state 97
 
     $default  reduce using rule 63 (expr)
 
-    Conflict between rule 63 and token STAR resolved as shift (NOT < STAR).
-    Conflict between rule 63 and token DIV resolved as shift (NOT < DIV).
-    Conflict between rule 63 and token MINUS resolved as shift (NOT < MINUS).
-    Conflict between rule 63 and token PLUS resolved as shift (NOT < PLUS).
-    Conflict between rule 63 and token EQ resolved as shift (NOT < EQ).
-    Conflict between rule 63 and token GE resolved as shift (NOT < GE).
-    Conflict between rule 63 and token GT resolved as shift (NOT < GT).
-    Conflict between rule 63 and token LE resolved as shift (NOT < LE).
-    Conflict between rule 63 and token LT resolved as shift (NOT < LT).
-    Conflict between rule 63 and token MOD resolved as shift (NOT < MOD).
-    Conflict between rule 63 and token NE resolved as shift (NOT < NE).
-    Conflict between rule 63 and token AND resolved as reduce (AND < NOT).
-    Conflict between rule 63 and token OR resolved as reduce (OR < NOT).
+    Conflict between rule 63 and token STAR resolved as shift (PLUS < STAR).
+    Conflict between rule 63 and token DIV resolved as shift (PLUS < DIV).
+    Conflict between rule 63 and token MINUS resolved as reduce (%left MINUS).
+    Conflict between rule 63 and token PLUS resolved as reduce (%left PLUS).
+    Conflict between rule 63 and token EQ resolved as reduce (EQ < PLUS).
+    Conflict between rule 63 and token GE resolved as reduce (GE < PLUS).
+    Conflict between rule 63 and token GT resolved as reduce (GT < PLUS).
+    Conflict between rule 63 and token LE resolved as reduce (LE < PLUS).
+    Conflict between rule 63 and token LT resolved as reduce (LT < PLUS).
+    Conflict between rule 63 and token MOD resolved as shift (PLUS < MOD).
+    Conflict between rule 63 and token NE resolved as reduce (NE < PLUS).
+    Conflict between rule 63 and token AND resolved as reduce (AND < PLUS).
+    Conflict between rule 63 and token OR resolved as reduce (OR < PLUS).
 
 
 state 85
 
-   45 funcinvocation: . IDENTIFIER LPAR expr funcinvocation2 RPAR
-   46               | . IDENTIFIER LPAR RPAR
-   47               | . IDENTIFIER LPAR error RPAR
-   50 expr: . expr OR expr
-   51     | . expr AND expr
-   52     | . expr LT expr
-   53     | . expr GT expr
-   54     | . expr EQ expr
-   55     | . expr NE expr
-   56     | . expr LE expr
-   57     | . expr GE expr
-   58     | . expr PLUS expr
-   59     | . expr MINUS expr
-   60     | . expr STAR expr
-   60     | expr STAR . expr
-   61     | . expr DIV expr
-   62     | . expr MOD expr
-   63     | . NOT expr
-   64     | . MINUS expr
-   65     | . PLUS expr
-   66     | . NATURAL
-   67     | . DECIMAL
-   68     | . IDENTIFIER
-   69     | . funcinvocation
-   70     | . LPAR expr RPAR
-   71     | . LPAR error RPAR
+   69 expr: LPAR error . RPAR
 
-    MINUS       shift, and go to state 59
-    PLUS        shift, and go to state 60
-    LPAR        shift, and go to state 61
-    NOT         shift, and go to state 62
-    IDENTIFIER  shift, and go to state 63
-    NATURAL     shift, and go to state 64
-    DECIMAL     shift, and go to state 65
-
-    funcinvocation  go to state 66
-    expr            go to state 112
+    RPAR  shift, and go to state 113
 
 
 state 86
 
-   45 funcinvocation: . IDENTIFIER LPAR expr funcinvocation2 RPAR
-   46               | . IDENTIFIER LPAR RPAR
-   47               | . IDENTIFIER LPAR error RPAR
-   50 expr: . expr OR expr
-   51     | . expr AND expr
-   52     | . expr LT expr
-   53     | . expr GT expr
-   54     | . expr EQ expr
-   55     | . expr NE expr
-   56     | . expr LE expr
-   57     | . expr GE expr
-   58     | . expr PLUS expr
-   59     | . expr MINUS expr
-   60     | . expr STAR expr
-   61     | . expr DIV expr
-   61     | expr DIV . expr
-   62     | . expr MOD expr
-   63     | . NOT expr
-   64     | . MINUS expr
-   65     | . PLUS expr
-   66     | . NATURAL
-   67     | . DECIMAL
-   68     | . IDENTIFIER
-   69     | . funcinvocation
-   70     | . LPAR expr RPAR
-   71     | . LPAR error RPAR
+   48 expr: expr . OR expr
+   49     | expr . AND expr
+   50     | expr . LT expr
+   51     | expr . GT expr
+   52     | expr . EQ expr
+   53     | expr . NE expr
+   54     | expr . LE expr
+   55     | expr . GE expr
+   56     | expr . PLUS expr
+   57     | expr . MINUS expr
+   58     | expr . STAR expr
+   59     | expr . DIV expr
+   60     | expr . MOD expr
+   68     | LPAR expr . RPAR
 
-    MINUS       shift, and go to state 59
-    PLUS        shift, and go to state 60
-    LPAR        shift, and go to state 61
-    NOT         shift, and go to state 62
-    IDENTIFIER  shift, and go to state 63
-    NATURAL     shift, and go to state 64
-    DECIMAL     shift, and go to state 65
-
-    funcinvocation  go to state 66
-    expr            go to state 113
+    STAR   shift, and go to state 88
+    DIV    shift, and go to state 89
+    MINUS  shift, and go to state 90
+    PLUS   shift, and go to state 91
+    EQ     shift, and go to state 92
+    GE     shift, and go to state 93
+    GT     shift, and go to state 94
+    LE     shift, and go to state 95
+    LT     shift, and go to state 96
+    MOD    shift, and go to state 97
+    NE     shift, and go to state 98
+    AND    shift, and go to state 99
+    OR     shift, and go to state 100
+    RPAR   shift, and go to state 114
 
 
 state 87
 
-   45 funcinvocation: . IDENTIFIER LPAR expr funcinvocation2 RPAR
-   46               | . IDENTIFIER LPAR RPAR
-   47               | . IDENTIFIER LPAR error RPAR
-   50 expr: . expr OR expr
-   51     | . expr AND expr
-   52     | . expr LT expr
-   53     | . expr GT expr
-   54     | . expr EQ expr
-   55     | . expr NE expr
-   56     | . expr LE expr
-   57     | . expr GE expr
-   58     | . expr PLUS expr
-   59     | . expr MINUS expr
-   59     | expr MINUS . expr
-   60     | . expr STAR expr
-   61     | . expr DIV expr
-   62     | . expr MOD expr
-   63     | . NOT expr
-   64     | . MINUS expr
-   65     | . PLUS expr
-   66     | . NATURAL
-   67     | . DECIMAL
-   68     | . IDENTIFIER
-   69     | . funcinvocation
-   70     | . LPAR expr RPAR
-   71     | . LPAR error RPAR
+   48 expr: expr . OR expr
+   49     | expr . AND expr
+   50     | expr . LT expr
+   51     | expr . GT expr
+   52     | expr . EQ expr
+   53     | expr . NE expr
+   54     | expr . LE expr
+   55     | expr . GE expr
+   56     | expr . PLUS expr
+   57     | expr . MINUS expr
+   58     | expr . STAR expr
+   59     | expr . DIV expr
+   60     | expr . MOD expr
+   61     | NOT expr .  [SEMICOLON, COMMA, LBRACE, AND, OR, RPAR, RSQ]
 
-    MINUS       shift, and go to state 59
-    PLUS        shift, and go to state 60
-    LPAR        shift, and go to state 61
-    NOT         shift, and go to state 62
-    IDENTIFIER  shift, and go to state 63
-    NATURAL     shift, and go to state 64
-    DECIMAL     shift, and go to state 65
+    STAR   shift, and go to state 88
+    DIV    shift, and go to state 89
+    MINUS  shift, and go to state 90
+    PLUS   shift, and go to state 91
+    EQ     shift, and go to state 92
+    GE     shift, and go to state 93
+    GT     shift, and go to state 94
+    LE     shift, and go to state 95
+    LT     shift, and go to state 96
+    MOD    shift, and go to state 97
+    NE     shift, and go to state 98
 
-    funcinvocation  go to state 66
-    expr            go to state 114
+    $default  reduce using rule 61 (expr)
+
+    Conflict between rule 61 and token STAR resolved as shift (NOT < STAR).
+    Conflict between rule 61 and token DIV resolved as shift (NOT < DIV).
+    Conflict between rule 61 and token MINUS resolved as shift (NOT < MINUS).
+    Conflict between rule 61 and token PLUS resolved as shift (NOT < PLUS).
+    Conflict between rule 61 and token EQ resolved as shift (NOT < EQ).
+    Conflict between rule 61 and token GE resolved as shift (NOT < GE).
+    Conflict between rule 61 and token GT resolved as shift (NOT < GT).
+    Conflict between rule 61 and token LE resolved as shift (NOT < LE).
+    Conflict between rule 61 and token LT resolved as shift (NOT < LT).
+    Conflict between rule 61 and token MOD resolved as shift (NOT < MOD).
+    Conflict between rule 61 and token NE resolved as shift (NOT < NE).
+    Conflict between rule 61 and token AND resolved as reduce (AND < NOT).
+    Conflict between rule 61 and token OR resolved as reduce (OR < NOT).
 
 
 state 88
 
-   45 funcinvocation: . IDENTIFIER LPAR expr funcinvocation2 RPAR
-   46               | . IDENTIFIER LPAR RPAR
-   47               | . IDENTIFIER LPAR error RPAR
-   50 expr: . expr OR expr
-   51     | . expr AND expr
-   52     | . expr LT expr
-   53     | . expr GT expr
-   54     | . expr EQ expr
-   55     | . expr NE expr
-   56     | . expr LE expr
-   57     | . expr GE expr
-   58     | . expr PLUS expr
-   58     | expr PLUS . expr
-   59     | . expr MINUS expr
-   60     | . expr STAR expr
-   61     | . expr DIV expr
-   62     | . expr MOD expr
-   63     | . NOT expr
-   64     | . MINUS expr
-   65     | . PLUS expr
-   66     | . NATURAL
-   67     | . DECIMAL
-   68     | . IDENTIFIER
-   69     | . funcinvocation
-   70     | . LPAR expr RPAR
-   71     | . LPAR error RPAR
+   43 funcinvocation: . IDENTIFIER LPAR expr funcinvocation2 RPAR
+   44               | . IDENTIFIER LPAR RPAR
+   45               | . IDENTIFIER LPAR error RPAR
+   48 expr: . expr OR expr
+   49     | . expr AND expr
+   50     | . expr LT expr
+   51     | . expr GT expr
+   52     | . expr EQ expr
+   53     | . expr NE expr
+   54     | . expr LE expr
+   55     | . expr GE expr
+   56     | . expr PLUS expr
+   57     | . expr MINUS expr
+   58     | . expr STAR expr
+   58     | expr STAR . expr
+   59     | . expr DIV expr
+   60     | . expr MOD expr
+   61     | . NOT expr
+   62     | . MINUS expr
+   63     | . PLUS expr
+   64     | . NATURAL
+   65     | . DECIMAL
+   66     | . IDENTIFIER
+   67     | . funcinvocation
+   68     | . LPAR expr RPAR
+   69     | . LPAR error RPAR
 
-    MINUS       shift, and go to state 59
-    PLUS        shift, and go to state 60
-    LPAR        shift, and go to state 61
-    NOT         shift, and go to state 62
-    IDENTIFIER  shift, and go to state 63
-    NATURAL     shift, and go to state 64
-    DECIMAL     shift, and go to state 65
+    MINUS       shift, and go to state 62
+    PLUS        shift, and go to state 63
+    LPAR        shift, and go to state 64
+    NOT         shift, and go to state 65
+    IDENTIFIER  shift, and go to state 66
+    NATURAL     shift, and go to state 67
+    DECIMAL     shift, and go to state 68
 
-    funcinvocation  go to state 66
+    funcinvocation  go to state 69
     expr            go to state 115
 
 
 state 89
 
-   45 funcinvocation: . IDENTIFIER LPAR expr funcinvocation2 RPAR
-   46               | . IDENTIFIER LPAR RPAR
-   47               | . IDENTIFIER LPAR error RPAR
-   50 expr: . expr OR expr
-   51     | . expr AND expr
-   52     | . expr LT expr
-   53     | . expr GT expr
-   54     | . expr EQ expr
-   54     | expr EQ . expr
-   55     | . expr NE expr
-   56     | . expr LE expr
-   57     | . expr GE expr
-   58     | . expr PLUS expr
-   59     | . expr MINUS expr
-   60     | . expr STAR expr
-   61     | . expr DIV expr
-   62     | . expr MOD expr
-   63     | . NOT expr
-   64     | . MINUS expr
-   65     | . PLUS expr
-   66     | . NATURAL
-   67     | . DECIMAL
-   68     | . IDENTIFIER
-   69     | . funcinvocation
-   70     | . LPAR expr RPAR
-   71     | . LPAR error RPAR
+   43 funcinvocation: . IDENTIFIER LPAR expr funcinvocation2 RPAR
+   44               | . IDENTIFIER LPAR RPAR
+   45               | . IDENTIFIER LPAR error RPAR
+   48 expr: . expr OR expr
+   49     | . expr AND expr
+   50     | . expr LT expr
+   51     | . expr GT expr
+   52     | . expr EQ expr
+   53     | . expr NE expr
+   54     | . expr LE expr
+   55     | . expr GE expr
+   56     | . expr PLUS expr
+   57     | . expr MINUS expr
+   58     | . expr STAR expr
+   59     | . expr DIV expr
+   59     | expr DIV . expr
+   60     | . expr MOD expr
+   61     | . NOT expr
+   62     | . MINUS expr
+   63     | . PLUS expr
+   64     | . NATURAL
+   65     | . DECIMAL
+   66     | . IDENTIFIER
+   67     | . funcinvocation
+   68     | . LPAR expr RPAR
+   69     | . LPAR error RPAR
 
-    MINUS       shift, and go to state 59
-    PLUS        shift, and go to state 60
-    LPAR        shift, and go to state 61
-    NOT         shift, and go to state 62
-    IDENTIFIER  shift, and go to state 63
-    NATURAL     shift, and go to state 64
-    DECIMAL     shift, and go to state 65
+    MINUS       shift, and go to state 62
+    PLUS        shift, and go to state 63
+    LPAR        shift, and go to state 64
+    NOT         shift, and go to state 65
+    IDENTIFIER  shift, and go to state 66
+    NATURAL     shift, and go to state 67
+    DECIMAL     shift, and go to state 68
 
-    funcinvocation  go to state 66
+    funcinvocation  go to state 69
     expr            go to state 116
 
 
 state 90
 
-   45 funcinvocation: . IDENTIFIER LPAR expr funcinvocation2 RPAR
-   46               | . IDENTIFIER LPAR RPAR
-   47               | . IDENTIFIER LPAR error RPAR
-   50 expr: . expr OR expr
-   51     | . expr AND expr
-   52     | . expr LT expr
-   53     | . expr GT expr
-   54     | . expr EQ expr
-   55     | . expr NE expr
-   56     | . expr LE expr
-   57     | . expr GE expr
-   57     | expr GE . expr
-   58     | . expr PLUS expr
-   59     | . expr MINUS expr
-   60     | . expr STAR expr
-   61     | . expr DIV expr
-   62     | . expr MOD expr
-   63     | . NOT expr
-   64     | . MINUS expr
-   65     | . PLUS expr
-   66     | . NATURAL
-   67     | . DECIMAL
-   68     | . IDENTIFIER
-   69     | . funcinvocation
-   70     | . LPAR expr RPAR
-   71     | . LPAR error RPAR
+   43 funcinvocation: . IDENTIFIER LPAR expr funcinvocation2 RPAR
+   44               | . IDENTIFIER LPAR RPAR
+   45               | . IDENTIFIER LPAR error RPAR
+   48 expr: . expr OR expr
+   49     | . expr AND expr
+   50     | . expr LT expr
+   51     | . expr GT expr
+   52     | . expr EQ expr
+   53     | . expr NE expr
+   54     | . expr LE expr
+   55     | . expr GE expr
+   56     | . expr PLUS expr
+   57     | . expr MINUS expr
+   57     | expr MINUS . expr
+   58     | . expr STAR expr
+   59     | . expr DIV expr
+   60     | . expr MOD expr
+   61     | . NOT expr
+   62     | . MINUS expr
+   63     | . PLUS expr
+   64     | . NATURAL
+   65     | . DECIMAL
+   66     | . IDENTIFIER
+   67     | . funcinvocation
+   68     | . LPAR expr RPAR
+   69     | . LPAR error RPAR
 
-    MINUS       shift, and go to state 59
-    PLUS        shift, and go to state 60
-    LPAR        shift, and go to state 61
-    NOT         shift, and go to state 62
-    IDENTIFIER  shift, and go to state 63
-    NATURAL     shift, and go to state 64
-    DECIMAL     shift, and go to state 65
+    MINUS       shift, and go to state 62
+    PLUS        shift, and go to state 63
+    LPAR        shift, and go to state 64
+    NOT         shift, and go to state 65
+    IDENTIFIER  shift, and go to state 66
+    NATURAL     shift, and go to state 67
+    DECIMAL     shift, and go to state 68
 
-    funcinvocation  go to state 66
+    funcinvocation  go to state 69
     expr            go to state 117
 
 
 state 91
 
-   45 funcinvocation: . IDENTIFIER LPAR expr funcinvocation2 RPAR
-   46               | . IDENTIFIER LPAR RPAR
-   47               | . IDENTIFIER LPAR error RPAR
-   50 expr: . expr OR expr
-   51     | . expr AND expr
-   52     | . expr LT expr
-   53     | . expr GT expr
-   53     | expr GT . expr
-   54     | . expr EQ expr
-   55     | . expr NE expr
-   56     | . expr LE expr
-   57     | . expr GE expr
-   58     | . expr PLUS expr
-   59     | . expr MINUS expr
-   60     | . expr STAR expr
-   61     | . expr DIV expr
-   62     | . expr MOD expr
-   63     | . NOT expr
-   64     | . MINUS expr
-   65     | . PLUS expr
-   66     | . NATURAL
-   67     | . DECIMAL
-   68     | . IDENTIFIER
-   69     | . funcinvocation
-   70     | . LPAR expr RPAR
-   71     | . LPAR error RPAR
+   43 funcinvocation: . IDENTIFIER LPAR expr funcinvocation2 RPAR
+   44               | . IDENTIFIER LPAR RPAR
+   45               | . IDENTIFIER LPAR error RPAR
+   48 expr: . expr OR expr
+   49     | . expr AND expr
+   50     | . expr LT expr
+   51     | . expr GT expr
+   52     | . expr EQ expr
+   53     | . expr NE expr
+   54     | . expr LE expr
+   55     | . expr GE expr
+   56     | . expr PLUS expr
+   56     | expr PLUS . expr
+   57     | . expr MINUS expr
+   58     | . expr STAR expr
+   59     | . expr DIV expr
+   60     | . expr MOD expr
+   61     | . NOT expr
+   62     | . MINUS expr
+   63     | . PLUS expr
+   64     | . NATURAL
+   65     | . DECIMAL
+   66     | . IDENTIFIER
+   67     | . funcinvocation
+   68     | . LPAR expr RPAR
+   69     | . LPAR error RPAR
 
-    MINUS       shift, and go to state 59
-    PLUS        shift, and go to state 60
-    LPAR        shift, and go to state 61
-    NOT         shift, and go to state 62
-    IDENTIFIER  shift, and go to state 63
-    NATURAL     shift, and go to state 64
-    DECIMAL     shift, and go to state 65
+    MINUS       shift, and go to state 62
+    PLUS        shift, and go to state 63
+    LPAR        shift, and go to state 64
+    NOT         shift, and go to state 65
+    IDENTIFIER  shift, and go to state 66
+    NATURAL     shift, and go to state 67
+    DECIMAL     shift, and go to state 68
 
-    funcinvocation  go to state 66
+    funcinvocation  go to state 69
     expr            go to state 118
 
 
 state 92
 
-   45 funcinvocation: . IDENTIFIER LPAR expr funcinvocation2 RPAR
-   46               | . IDENTIFIER LPAR RPAR
-   47               | . IDENTIFIER LPAR error RPAR
-   50 expr: . expr OR expr
-   51     | . expr AND expr
-   52     | . expr LT expr
-   53     | . expr GT expr
-   54     | . expr EQ expr
-   55     | . expr NE expr
-   56     | . expr LE expr
-   56     | expr LE . expr
-   57     | . expr GE expr
-   58     | . expr PLUS expr
-   59     | . expr MINUS expr
-   60     | . expr STAR expr
-   61     | . expr DIV expr
-   62     | . expr MOD expr
-   63     | . NOT expr
-   64     | . MINUS expr
-   65     | . PLUS expr
-   66     | . NATURAL
-   67     | . DECIMAL
-   68     | . IDENTIFIER
-   69     | . funcinvocation
-   70     | . LPAR expr RPAR
-   71     | . LPAR error RPAR
+   43 funcinvocation: . IDENTIFIER LPAR expr funcinvocation2 RPAR
+   44               | . IDENTIFIER LPAR RPAR
+   45               | . IDENTIFIER LPAR error RPAR
+   48 expr: . expr OR expr
+   49     | . expr AND expr
+   50     | . expr LT expr
+   51     | . expr GT expr
+   52     | . expr EQ expr
+   52     | expr EQ . expr
+   53     | . expr NE expr
+   54     | . expr LE expr
+   55     | . expr GE expr
+   56     | . expr PLUS expr
+   57     | . expr MINUS expr
+   58     | . expr STAR expr
+   59     | . expr DIV expr
+   60     | . expr MOD expr
+   61     | . NOT expr
+   62     | . MINUS expr
+   63     | . PLUS expr
+   64     | . NATURAL
+   65     | . DECIMAL
+   66     | . IDENTIFIER
+   67     | . funcinvocation
+   68     | . LPAR expr RPAR
+   69     | . LPAR error RPAR
 
-    MINUS       shift, and go to state 59
-    PLUS        shift, and go to state 60
-    LPAR        shift, and go to state 61
-    NOT         shift, and go to state 62
-    IDENTIFIER  shift, and go to state 63
-    NATURAL     shift, and go to state 64
-    DECIMAL     shift, and go to state 65
+    MINUS       shift, and go to state 62
+    PLUS        shift, and go to state 63
+    LPAR        shift, and go to state 64
+    NOT         shift, and go to state 65
+    IDENTIFIER  shift, and go to state 66
+    NATURAL     shift, and go to state 67
+    DECIMAL     shift, and go to state 68
 
-    funcinvocation  go to state 66
+    funcinvocation  go to state 69
     expr            go to state 119
 
 
 state 93
 
-   45 funcinvocation: . IDENTIFIER LPAR expr funcinvocation2 RPAR
-   46               | . IDENTIFIER LPAR RPAR
-   47               | . IDENTIFIER LPAR error RPAR
-   50 expr: . expr OR expr
-   51     | . expr AND expr
-   52     | . expr LT expr
-   52     | expr LT . expr
-   53     | . expr GT expr
-   54     | . expr EQ expr
-   55     | . expr NE expr
-   56     | . expr LE expr
-   57     | . expr GE expr
-   58     | . expr PLUS expr
-   59     | . expr MINUS expr
-   60     | . expr STAR expr
-   61     | . expr DIV expr
-   62     | . expr MOD expr
-   63     | . NOT expr
-   64     | . MINUS expr
-   65     | . PLUS expr
-   66     | . NATURAL
-   67     | . DECIMAL
-   68     | . IDENTIFIER
-   69     | . funcinvocation
-   70     | . LPAR expr RPAR
-   71     | . LPAR error RPAR
+   43 funcinvocation: . IDENTIFIER LPAR expr funcinvocation2 RPAR
+   44               | . IDENTIFIER LPAR RPAR
+   45               | . IDENTIFIER LPAR error RPAR
+   48 expr: . expr OR expr
+   49     | . expr AND expr
+   50     | . expr LT expr
+   51     | . expr GT expr
+   52     | . expr EQ expr
+   53     | . expr NE expr
+   54     | . expr LE expr
+   55     | . expr GE expr
+   55     | expr GE . expr
+   56     | . expr PLUS expr
+   57     | . expr MINUS expr
+   58     | . expr STAR expr
+   59     | . expr DIV expr
+   60     | . expr MOD expr
+   61     | . NOT expr
+   62     | . MINUS expr
+   63     | . PLUS expr
+   64     | . NATURAL
+   65     | . DECIMAL
+   66     | . IDENTIFIER
+   67     | . funcinvocation
+   68     | . LPAR expr RPAR
+   69     | . LPAR error RPAR
 
-    MINUS       shift, and go to state 59
-    PLUS        shift, and go to state 60
-    LPAR        shift, and go to state 61
-    NOT         shift, and go to state 62
-    IDENTIFIER  shift, and go to state 63
-    NATURAL     shift, and go to state 64
-    DECIMAL     shift, and go to state 65
+    MINUS       shift, and go to state 62
+    PLUS        shift, and go to state 63
+    LPAR        shift, and go to state 64
+    NOT         shift, and go to state 65
+    IDENTIFIER  shift, and go to state 66
+    NATURAL     shift, and go to state 67
+    DECIMAL     shift, and go to state 68
 
-    funcinvocation  go to state 66
+    funcinvocation  go to state 69
     expr            go to state 120
 
 
 state 94
 
-   45 funcinvocation: . IDENTIFIER LPAR expr funcinvocation2 RPAR
-   46               | . IDENTIFIER LPAR RPAR
-   47               | . IDENTIFIER LPAR error RPAR
-   50 expr: . expr OR expr
-   51     | . expr AND expr
-   52     | . expr LT expr
-   53     | . expr GT expr
-   54     | . expr EQ expr
-   55     | . expr NE expr
-   56     | . expr LE expr
-   57     | . expr GE expr
-   58     | . expr PLUS expr
-   59     | . expr MINUS expr
-   60     | . expr STAR expr
-   61     | . expr DIV expr
-   62     | . expr MOD expr
-   62     | expr MOD . expr
-   63     | . NOT expr
-   64     | . MINUS expr
-   65     | . PLUS expr
-   66     | . NATURAL
-   67     | . DECIMAL
-   68     | . IDENTIFIER
-   69     | . funcinvocation
-   70     | . LPAR expr RPAR
-   71     | . LPAR error RPAR
+   43 funcinvocation: . IDENTIFIER LPAR expr funcinvocation2 RPAR
+   44               | . IDENTIFIER LPAR RPAR
+   45               | . IDENTIFIER LPAR error RPAR
+   48 expr: . expr OR expr
+   49     | . expr AND expr
+   50     | . expr LT expr
+   51     | . expr GT expr
+   51     | expr GT . expr
+   52     | . expr EQ expr
+   53     | . expr NE expr
+   54     | . expr LE expr
+   55     | . expr GE expr
+   56     | . expr PLUS expr
+   57     | . expr MINUS expr
+   58     | . expr STAR expr
+   59     | . expr DIV expr
+   60     | . expr MOD expr
+   61     | . NOT expr
+   62     | . MINUS expr
+   63     | . PLUS expr
+   64     | . NATURAL
+   65     | . DECIMAL
+   66     | . IDENTIFIER
+   67     | . funcinvocation
+   68     | . LPAR expr RPAR
+   69     | . LPAR error RPAR
 
-    MINUS       shift, and go to state 59
-    PLUS        shift, and go to state 60
-    LPAR        shift, and go to state 61
-    NOT         shift, and go to state 62
-    IDENTIFIER  shift, and go to state 63
-    NATURAL     shift, and go to state 64
-    DECIMAL     shift, and go to state 65
+    MINUS       shift, and go to state 62
+    PLUS        shift, and go to state 63
+    LPAR        shift, and go to state 64
+    NOT         shift, and go to state 65
+    IDENTIFIER  shift, and go to state 66
+    NATURAL     shift, and go to state 67
+    DECIMAL     shift, and go to state 68
 
-    funcinvocation  go to state 66
+    funcinvocation  go to state 69
     expr            go to state 121
 
 
 state 95
 
-   45 funcinvocation: . IDENTIFIER LPAR expr funcinvocation2 RPAR
-   46               | . IDENTIFIER LPAR RPAR
-   47               | . IDENTIFIER LPAR error RPAR
-   50 expr: . expr OR expr
-   51     | . expr AND expr
-   52     | . expr LT expr
-   53     | . expr GT expr
-   54     | . expr EQ expr
-   55     | . expr NE expr
-   55     | expr NE . expr
-   56     | . expr LE expr
-   57     | . expr GE expr
-   58     | . expr PLUS expr
-   59     | . expr MINUS expr
-   60     | . expr STAR expr
-   61     | . expr DIV expr
-   62     | . expr MOD expr
-   63     | . NOT expr
-   64     | . MINUS expr
-   65     | . PLUS expr
-   66     | . NATURAL
-   67     | . DECIMAL
-   68     | . IDENTIFIER
-   69     | . funcinvocation
-   70     | . LPAR expr RPAR
-   71     | . LPAR error RPAR
+   43 funcinvocation: . IDENTIFIER LPAR expr funcinvocation2 RPAR
+   44               | . IDENTIFIER LPAR RPAR
+   45               | . IDENTIFIER LPAR error RPAR
+   48 expr: . expr OR expr
+   49     | . expr AND expr
+   50     | . expr LT expr
+   51     | . expr GT expr
+   52     | . expr EQ expr
+   53     | . expr NE expr
+   54     | . expr LE expr
+   54     | expr LE . expr
+   55     | . expr GE expr
+   56     | . expr PLUS expr
+   57     | . expr MINUS expr
+   58     | . expr STAR expr
+   59     | . expr DIV expr
+   60     | . expr MOD expr
+   61     | . NOT expr
+   62     | . MINUS expr
+   63     | . PLUS expr
+   64     | . NATURAL
+   65     | . DECIMAL
+   66     | . IDENTIFIER
+   67     | . funcinvocation
+   68     | . LPAR expr RPAR
+   69     | . LPAR error RPAR
 
-    MINUS       shift, and go to state 59
-    PLUS        shift, and go to state 60
-    LPAR        shift, and go to state 61
-    NOT         shift, and go to state 62
-    IDENTIFIER  shift, and go to state 63
-    NATURAL     shift, and go to state 64
-    DECIMAL     shift, and go to state 65
+    MINUS       shift, and go to state 62
+    PLUS        shift, and go to state 63
+    LPAR        shift, and go to state 64
+    NOT         shift, and go to state 65
+    IDENTIFIER  shift, and go to state 66
+    NATURAL     shift, and go to state 67
+    DECIMAL     shift, and go to state 68
 
-    funcinvocation  go to state 66
+    funcinvocation  go to state 69
     expr            go to state 122
 
 
 state 96
 
-   45 funcinvocation: . IDENTIFIER LPAR expr funcinvocation2 RPAR
-   46               | . IDENTIFIER LPAR RPAR
-   47               | . IDENTIFIER LPAR error RPAR
-   50 expr: . expr OR expr
-   51     | . expr AND expr
-   51     | expr AND . expr
-   52     | . expr LT expr
-   53     | . expr GT expr
-   54     | . expr EQ expr
-   55     | . expr NE expr
-   56     | . expr LE expr
-   57     | . expr GE expr
-   58     | . expr PLUS expr
-   59     | . expr MINUS expr
-   60     | . expr STAR expr
-   61     | . expr DIV expr
-   62     | . expr MOD expr
-   63     | . NOT expr
-   64     | . MINUS expr
-   65     | . PLUS expr
-   66     | . NATURAL
-   67     | . DECIMAL
-   68     | . IDENTIFIER
-   69     | . funcinvocation
-   70     | . LPAR expr RPAR
-   71     | . LPAR error RPAR
+   43 funcinvocation: . IDENTIFIER LPAR expr funcinvocation2 RPAR
+   44               | . IDENTIFIER LPAR RPAR
+   45               | . IDENTIFIER LPAR error RPAR
+   48 expr: . expr OR expr
+   49     | . expr AND expr
+   50     | . expr LT expr
+   50     | expr LT . expr
+   51     | . expr GT expr
+   52     | . expr EQ expr
+   53     | . expr NE expr
+   54     | . expr LE expr
+   55     | . expr GE expr
+   56     | . expr PLUS expr
+   57     | . expr MINUS expr
+   58     | . expr STAR expr
+   59     | . expr DIV expr
+   60     | . expr MOD expr
+   61     | . NOT expr
+   62     | . MINUS expr
+   63     | . PLUS expr
+   64     | . NATURAL
+   65     | . DECIMAL
+   66     | . IDENTIFIER
+   67     | . funcinvocation
+   68     | . LPAR expr RPAR
+   69     | . LPAR error RPAR
 
-    MINUS       shift, and go to state 59
-    PLUS        shift, and go to state 60
-    LPAR        shift, and go to state 61
-    NOT         shift, and go to state 62
-    IDENTIFIER  shift, and go to state 63
-    NATURAL     shift, and go to state 64
-    DECIMAL     shift, and go to state 65
+    MINUS       shift, and go to state 62
+    PLUS        shift, and go to state 63
+    LPAR        shift, and go to state 64
+    NOT         shift, and go to state 65
+    IDENTIFIER  shift, and go to state 66
+    NATURAL     shift, and go to state 67
+    DECIMAL     shift, and go to state 68
 
-    funcinvocation  go to state 66
+    funcinvocation  go to state 69
     expr            go to state 123
 
 
 state 97
 
-   45 funcinvocation: . IDENTIFIER LPAR expr funcinvocation2 RPAR
-   46               | . IDENTIFIER LPAR RPAR
-   47               | . IDENTIFIER LPAR error RPAR
-   50 expr: . expr OR expr
-   50     | expr OR . expr
-   51     | . expr AND expr
-   52     | . expr LT expr
-   53     | . expr GT expr
-   54     | . expr EQ expr
-   55     | . expr NE expr
-   56     | . expr LE expr
-   57     | . expr GE expr
-   58     | . expr PLUS expr
-   59     | . expr MINUS expr
-   60     | . expr STAR expr
-   61     | . expr DIV expr
-   62     | . expr MOD expr
-   63     | . NOT expr
-   64     | . MINUS expr
-   65     | . PLUS expr
-   66     | . NATURAL
-   67     | . DECIMAL
-   68     | . IDENTIFIER
-   69     | . funcinvocation
-   70     | . LPAR expr RPAR
-   71     | . LPAR error RPAR
+   43 funcinvocation: . IDENTIFIER LPAR expr funcinvocation2 RPAR
+   44               | . IDENTIFIER LPAR RPAR
+   45               | . IDENTIFIER LPAR error RPAR
+   48 expr: . expr OR expr
+   49     | . expr AND expr
+   50     | . expr LT expr
+   51     | . expr GT expr
+   52     | . expr EQ expr
+   53     | . expr NE expr
+   54     | . expr LE expr
+   55     | . expr GE expr
+   56     | . expr PLUS expr
+   57     | . expr MINUS expr
+   58     | . expr STAR expr
+   59     | . expr DIV expr
+   60     | . expr MOD expr
+   60     | expr MOD . expr
+   61     | . NOT expr
+   62     | . MINUS expr
+   63     | . PLUS expr
+   64     | . NATURAL
+   65     | . DECIMAL
+   66     | . IDENTIFIER
+   67     | . funcinvocation
+   68     | . LPAR expr RPAR
+   69     | . LPAR error RPAR
 
-    MINUS       shift, and go to state 59
-    PLUS        shift, and go to state 60
-    LPAR        shift, and go to state 61
-    NOT         shift, and go to state 62
-    IDENTIFIER  shift, and go to state 63
-    NATURAL     shift, and go to state 64
-    DECIMAL     shift, and go to state 65
+    MINUS       shift, and go to state 62
+    PLUS        shift, and go to state 63
+    LPAR        shift, and go to state 64
+    NOT         shift, and go to state 65
+    IDENTIFIER  shift, and go to state 66
+    NATURAL     shift, and go to state 67
+    DECIMAL     shift, and go to state 68
 
-    funcinvocation  go to state 66
+    funcinvocation  go to state 69
     expr            go to state 124
 
 
 state 98
 
-   28 statement: . IDENTIFIER ASSIGN expr
-   29          | . LBRACE statement2 RBRACE
-   30          | . IF expr LBRACE statement2 RBRACE ELSE LBRACE statement2 RBRACE
-   31          | . IF expr LBRACE statement2 RBRACE
-   32          | . FOR expr LBRACE statement2 RBRACE
-   33          | . FOR LBRACE statement2 RBRACE
-   33          | FOR LBRACE statement2 . RBRACE
-   34          | . RETURN expr
-   35          | . RETURN
-   36          | . funcinvocation
-   37          | . parseargs
-   38          | . PRINT LPAR expr RPAR
-   39          | . PRINT LPAR STRLIT RPAR
-   40          | . error
-   41 statement2: statement2 . statement SEMICOLON
-   43 parseargs: . IDENTIFIER COMMA BLANKID ASSIGN PARSEINT LPAR CMDARGS LSQ expr RSQ RPAR
-   44          | . IDENTIFIER COMMA BLANKID ASSIGN PARSEINT LPAR error RPAR
-   45 funcinvocation: . IDENTIFIER LPAR expr funcinvocation2 RPAR
-   46               | . IDENTIFIER LPAR RPAR
-   47               | . IDENTIFIER LPAR error RPAR
+   43 funcinvocation: . IDENTIFIER LPAR expr funcinvocation2 RPAR
+   44               | . IDENTIFIER LPAR RPAR
+   45               | . IDENTIFIER LPAR error RPAR
+   48 expr: . expr OR expr
+   49     | . expr AND expr
+   50     | . expr LT expr
+   51     | . expr GT expr
+   52     | . expr EQ expr
+   53     | . expr NE expr
+   53     | expr NE . expr
+   54     | . expr LE expr
+   55     | . expr GE expr
+   56     | . expr PLUS expr
+   57     | . expr MINUS expr
+   58     | . expr STAR expr
+   59     | . expr DIV expr
+   60     | . expr MOD expr
+   61     | . NOT expr
+   62     | . MINUS expr
+   63     | . PLUS expr
+   64     | . NATURAL
+   65     | . DECIMAL
+   66     | . IDENTIFIER
+   67     | . funcinvocation
+   68     | . LPAR expr RPAR
+   69     | . LPAR error RPAR
 
-    error       shift, and go to state 41
-    LBRACE      shift, and go to state 43
-    RBRACE      shift, and go to state 125
-    RETURN      shift, and go to state 45
-    FOR         shift, and go to state 46
-    IF          shift, and go to state 47
-    PRINT       shift, and go to state 48
-    IDENTIFIER  shift, and go to state 49
+    MINUS       shift, and go to state 62
+    PLUS        shift, and go to state 63
+    LPAR        shift, and go to state 64
+    NOT         shift, and go to state 65
+    IDENTIFIER  shift, and go to state 66
+    NATURAL     shift, and go to state 67
+    DECIMAL     shift, and go to state 68
 
-    statement       go to state 79
-    parseargs       go to state 52
-    funcinvocation  go to state 53
+    funcinvocation  go to state 69
+    expr            go to state 125
 
 
 state 99
 
-   32 statement: FOR expr LBRACE . statement2 RBRACE
-   41 statement2: . statement2 statement SEMICOLON
-   42           | .
+   43 funcinvocation: . IDENTIFIER LPAR expr funcinvocation2 RPAR
+   44               | . IDENTIFIER LPAR RPAR
+   45               | . IDENTIFIER LPAR error RPAR
+   48 expr: . expr OR expr
+   49     | . expr AND expr
+   49     | expr AND . expr
+   50     | . expr LT expr
+   51     | . expr GT expr
+   52     | . expr EQ expr
+   53     | . expr NE expr
+   54     | . expr LE expr
+   55     | . expr GE expr
+   56     | . expr PLUS expr
+   57     | . expr MINUS expr
+   58     | . expr STAR expr
+   59     | . expr DIV expr
+   60     | . expr MOD expr
+   61     | . NOT expr
+   62     | . MINUS expr
+   63     | . PLUS expr
+   64     | . NATURAL
+   65     | . DECIMAL
+   66     | . IDENTIFIER
+   67     | . funcinvocation
+   68     | . LPAR expr RPAR
+   69     | . LPAR error RPAR
 
-    $default  reduce using rule 42 (statement2)
+    MINUS       shift, and go to state 62
+    PLUS        shift, and go to state 63
+    LPAR        shift, and go to state 64
+    NOT         shift, and go to state 65
+    IDENTIFIER  shift, and go to state 66
+    NATURAL     shift, and go to state 67
+    DECIMAL     shift, and go to state 68
 
-    statement2  go to state 126
+    funcinvocation  go to state 69
+    expr            go to state 126
 
 
 state 100
 
-   30 statement: IF expr LBRACE . statement2 RBRACE ELSE LBRACE statement2 RBRACE
-   31          | IF expr LBRACE . statement2 RBRACE
-   41 statement2: . statement2 statement SEMICOLON
-   42           | .
+   43 funcinvocation: . IDENTIFIER LPAR expr funcinvocation2 RPAR
+   44               | . IDENTIFIER LPAR RPAR
+   45               | . IDENTIFIER LPAR error RPAR
+   48 expr: . expr OR expr
+   48     | expr OR . expr
+   49     | . expr AND expr
+   50     | . expr LT expr
+   51     | . expr GT expr
+   52     | . expr EQ expr
+   53     | . expr NE expr
+   54     | . expr LE expr
+   55     | . expr GE expr
+   56     | . expr PLUS expr
+   57     | . expr MINUS expr
+   58     | . expr STAR expr
+   59     | . expr DIV expr
+   60     | . expr MOD expr
+   61     | . NOT expr
+   62     | . MINUS expr
+   63     | . PLUS expr
+   64     | . NATURAL
+   65     | . DECIMAL
+   66     | . IDENTIFIER
+   67     | . funcinvocation
+   68     | . LPAR expr RPAR
+   69     | . LPAR error RPAR
 
-    $default  reduce using rule 42 (statement2)
+    MINUS       shift, and go to state 62
+    PLUS        shift, and go to state 63
+    LPAR        shift, and go to state 64
+    NOT         shift, and go to state 65
+    IDENTIFIER  shift, and go to state 66
+    NATURAL     shift, and go to state 67
+    DECIMAL     shift, and go to state 68
 
-    statement2  go to state 127
+    funcinvocation  go to state 69
+    expr            go to state 127
 
 
 state 101
 
-   39 statement: PRINT LPAR STRLIT . RPAR
+   26 statement: . IDENTIFIER ASSIGN expr
+   27          | . LBRACE statement2 RBRACE
+   28          | . IF expr LBRACE statement2 RBRACE ELSE LBRACE statement2 RBRACE
+   29          | . IF expr LBRACE statement2 RBRACE
+   30          | . FOR expr LBRACE statement2 RBRACE
+   31          | . FOR LBRACE statement2 RBRACE
+   31          | FOR LBRACE statement2 . RBRACE
+   32          | . RETURN expr
+   33          | . RETURN
+   34          | . funcinvocation
+   35          | . parseargs
+   36          | . PRINT LPAR expr RPAR
+   37          | . PRINT LPAR STRLIT RPAR
+   38          | . error
+   39 statement2: statement2 . statement SEMICOLON
+   41 parseargs: . IDENTIFIER COMMA BLANKID ASSIGN PARSEINT LPAR CMDARGS LSQ expr RSQ RPAR
+   42          | . IDENTIFIER COMMA BLANKID ASSIGN PARSEINT LPAR error RPAR
+   43 funcinvocation: . IDENTIFIER LPAR expr funcinvocation2 RPAR
+   44               | . IDENTIFIER LPAR RPAR
+   45               | . IDENTIFIER LPAR error RPAR
 
-    RPAR  shift, and go to state 128
+    error       shift, and go to state 46
+    LBRACE      shift, and go to state 48
+    RBRACE      shift, and go to state 128
+    RETURN      shift, and go to state 50
+    FOR         shift, and go to state 51
+    IF          shift, and go to state 52
+    PRINT       shift, and go to state 53
+    IDENTIFIER  shift, and go to state 54
+
+    statement       go to state 82
+    parseargs       go to state 57
+    funcinvocation  go to state 58
 
 
 state 102
 
-   38 statement: PRINT LPAR expr . RPAR
-   50 expr: expr . OR expr
-   51     | expr . AND expr
-   52     | expr . LT expr
-   53     | expr . GT expr
-   54     | expr . EQ expr
-   55     | expr . NE expr
-   56     | expr . LE expr
-   57     | expr . GE expr
-   58     | expr . PLUS expr
-   59     | expr . MINUS expr
-   60     | expr . STAR expr
-   61     | expr . DIV expr
-   62     | expr . MOD expr
+   30 statement: FOR expr LBRACE . statement2 RBRACE
+   39 statement2: . statement2 statement SEMICOLON
+   40           | .
 
-    STAR   shift, and go to state 85
-    DIV    shift, and go to state 86
-    MINUS  shift, and go to state 87
-    PLUS   shift, and go to state 88
-    EQ     shift, and go to state 89
-    GE     shift, and go to state 90
-    GT     shift, and go to state 91
-    LE     shift, and go to state 92
-    LT     shift, and go to state 93
-    MOD    shift, and go to state 94
-    NE     shift, and go to state 95
-    AND    shift, and go to state 96
-    OR     shift, and go to state 97
-    RPAR   shift, and go to state 129
+    $default  reduce using rule 40 (statement2)
+
+    statement2  go to state 129
 
 
 state 103
 
-   43 parseargs: IDENTIFIER COMMA BLANKID . ASSIGN PARSEINT LPAR CMDARGS LSQ expr RSQ RPAR
-   44          | IDENTIFIER COMMA BLANKID . ASSIGN PARSEINT LPAR error RPAR
+   28 statement: IF expr LBRACE . statement2 RBRACE ELSE LBRACE statement2 RBRACE
+   29          | IF expr LBRACE . statement2 RBRACE
+   39 statement2: . statement2 statement SEMICOLON
+   40           | .
 
-    ASSIGN  shift, and go to state 130
+    $default  reduce using rule 40 (statement2)
+
+    statement2  go to state 130
 
 
 state 104
 
-   28 statement: IDENTIFIER ASSIGN expr .  [SEMICOLON]
-   50 expr: expr . OR expr
-   51     | expr . AND expr
-   52     | expr . LT expr
-   53     | expr . GT expr
-   54     | expr . EQ expr
-   55     | expr . NE expr
-   56     | expr . LE expr
-   57     | expr . GE expr
-   58     | expr . PLUS expr
-   59     | expr . MINUS expr
-   60     | expr . STAR expr
-   61     | expr . DIV expr
-   62     | expr . MOD expr
-
-    STAR   shift, and go to state 85
-    DIV    shift, and go to state 86
-    MINUS  shift, and go to state 87
-    PLUS   shift, and go to state 88
-    EQ     shift, and go to state 89
-    GE     shift, and go to state 90
-    GT     shift, and go to state 91
-    LE     shift, and go to state 92
-    LT     shift, and go to state 93
-    MOD    shift, and go to state 94
-    NE     shift, and go to state 95
-    AND    shift, and go to state 96
-    OR     shift, and go to state 97
-
-    $default  reduce using rule 28 (statement)
-
-
-state 105
-
-   47 funcinvocation: IDENTIFIER LPAR error . RPAR
+   37 statement: PRINT LPAR STRLIT . RPAR
 
     RPAR  shift, and go to state 131
 
 
+state 105
+
+   36 statement: PRINT LPAR expr . RPAR
+   48 expr: expr . OR expr
+   49     | expr . AND expr
+   50     | expr . LT expr
+   51     | expr . GT expr
+   52     | expr . EQ expr
+   53     | expr . NE expr
+   54     | expr . LE expr
+   55     | expr . GE expr
+   56     | expr . PLUS expr
+   57     | expr . MINUS expr
+   58     | expr . STAR expr
+   59     | expr . DIV expr
+   60     | expr . MOD expr
+
+    STAR   shift, and go to state 88
+    DIV    shift, and go to state 89
+    MINUS  shift, and go to state 90
+    PLUS   shift, and go to state 91
+    EQ     shift, and go to state 92
+    GE     shift, and go to state 93
+    GT     shift, and go to state 94
+    LE     shift, and go to state 95
+    LT     shift, and go to state 96
+    MOD    shift, and go to state 97
+    NE     shift, and go to state 98
+    AND    shift, and go to state 99
+    OR     shift, and go to state 100
+    RPAR   shift, and go to state 132
+
+
 state 106
 
-   46 funcinvocation: IDENTIFIER LPAR RPAR .
+   41 parseargs: IDENTIFIER COMMA BLANKID . ASSIGN PARSEINT LPAR CMDARGS LSQ expr RSQ RPAR
+   42          | IDENTIFIER COMMA BLANKID . ASSIGN PARSEINT LPAR error RPAR
 
-    $default  reduce using rule 46 (funcinvocation)
+    ASSIGN  shift, and go to state 133
 
 
 state 107
 
-   45 funcinvocation: IDENTIFIER LPAR expr . funcinvocation2 RPAR
-   48 funcinvocation2: . COMMA expr funcinvocation2
-   49                | .  [RPAR]
-   50 expr: expr . OR expr
-   51     | expr . AND expr
-   52     | expr . LT expr
-   53     | expr . GT expr
-   54     | expr . EQ expr
-   55     | expr . NE expr
-   56     | expr . LE expr
-   57     | expr . GE expr
-   58     | expr . PLUS expr
-   59     | expr . MINUS expr
-   60     | expr . STAR expr
-   61     | expr . DIV expr
-   62     | expr . MOD expr
+   26 statement: IDENTIFIER ASSIGN expr .  [SEMICOLON]
+   48 expr: expr . OR expr
+   49     | expr . AND expr
+   50     | expr . LT expr
+   51     | expr . GT expr
+   52     | expr . EQ expr
+   53     | expr . NE expr
+   54     | expr . LE expr
+   55     | expr . GE expr
+   56     | expr . PLUS expr
+   57     | expr . MINUS expr
+   58     | expr . STAR expr
+   59     | expr . DIV expr
+   60     | expr . MOD expr
 
-    COMMA  shift, and go to state 132
-    STAR   shift, and go to state 85
-    DIV    shift, and go to state 86
-    MINUS  shift, and go to state 87
-    PLUS   shift, and go to state 88
-    EQ     shift, and go to state 89
-    GE     shift, and go to state 90
-    GT     shift, and go to state 91
-    LE     shift, and go to state 92
-    LT     shift, and go to state 93
-    MOD    shift, and go to state 94
-    NE     shift, and go to state 95
-    AND    shift, and go to state 96
-    OR     shift, and go to state 97
+    STAR   shift, and go to state 88
+    DIV    shift, and go to state 89
+    MINUS  shift, and go to state 90
+    PLUS   shift, and go to state 91
+    EQ     shift, and go to state 92
+    GE     shift, and go to state 93
+    GT     shift, and go to state 94
+    LE     shift, and go to state 95
+    LT     shift, and go to state 96
+    MOD    shift, and go to state 97
+    NE     shift, and go to state 98
+    AND    shift, and go to state 99
+    OR     shift, and go to state 100
 
-    $default  reduce using rule 49 (funcinvocation2)
-
-    funcinvocation2  go to state 133
+    $default  reduce using rule 26 (statement)
 
 
 state 108
 
-   21 parameters2: . COMMA IDENTIFIER type parameters2
-   21            | COMMA IDENTIFIER type . parameters2
-   22            | .  [RPAR]
+   45 funcinvocation: IDENTIFIER LPAR error . RPAR
 
-    COMMA  shift, and go to state 54
-
-    $default  reduce using rule 22 (parameters2)
-
-    parameters2  go to state 134
+    RPAR  shift, and go to state 134
 
 
 state 109
 
-   41 statement2: statement2 statement SEMICOLON .
+   44 funcinvocation: IDENTIFIER LPAR RPAR .
 
-    $default  reduce using rule 41 (statement2)
+    $default  reduce using rule 44 (funcinvocation)
 
 
 state 110
 
-   71 expr: LPAR error RPAR .
+   43 funcinvocation: IDENTIFIER LPAR expr . funcinvocation2 RPAR
+   46 funcinvocation2: . COMMA expr funcinvocation2
+   47                | .  [RPAR]
+   48 expr: expr . OR expr
+   49     | expr . AND expr
+   50     | expr . LT expr
+   51     | expr . GT expr
+   52     | expr . EQ expr
+   53     | expr . NE expr
+   54     | expr . LE expr
+   55     | expr . GE expr
+   56     | expr . PLUS expr
+   57     | expr . MINUS expr
+   58     | expr . STAR expr
+   59     | expr . DIV expr
+   60     | expr . MOD expr
 
-    $default  reduce using rule 71 (expr)
+    COMMA  shift, and go to state 135
+    STAR   shift, and go to state 88
+    DIV    shift, and go to state 89
+    MINUS  shift, and go to state 90
+    PLUS   shift, and go to state 91
+    EQ     shift, and go to state 92
+    GE     shift, and go to state 93
+    GT     shift, and go to state 94
+    LE     shift, and go to state 95
+    LT     shift, and go to state 96
+    MOD    shift, and go to state 97
+    NE     shift, and go to state 98
+    AND    shift, and go to state 99
+    OR     shift, and go to state 100
+
+    $default  reduce using rule 47 (funcinvocation2)
+
+    funcinvocation2  go to state 136
 
 
 state 111
 
-   70 expr: LPAR expr RPAR .
+   19 parameters2: COMMA IDENTIFIER type parameters2 .
 
-    $default  reduce using rule 70 (expr)
+    $default  reduce using rule 19 (parameters2)
 
 
 state 112
 
-   50 expr: expr . OR expr
-   51     | expr . AND expr
-   52     | expr . LT expr
-   53     | expr . GT expr
-   54     | expr . EQ expr
-   55     | expr . NE expr
-   56     | expr . LE expr
-   57     | expr . GE expr
-   58     | expr . PLUS expr
-   59     | expr . MINUS expr
-   60     | expr . STAR expr  [SEMICOLON, COMMA, STAR, DIV, MINUS, PLUS, EQ, GE, GT, LBRACE, LE, LT, MOD, NE, AND, OR, RPAR, RSQ]
-   60     | expr STAR expr .  [SEMICOLON, COMMA, STAR, DIV, MINUS, PLUS, EQ, GE, GT, LBRACE, LE, LT, MOD, NE, AND, OR, RPAR, RSQ]
-   61     | expr . DIV expr
-   62     | expr . MOD expr
+   39 statement2: statement2 statement SEMICOLON .
 
-    $default  reduce using rule 60 (expr)
-
-    Conflict between rule 60 and token STAR resolved as reduce (%left STAR).
-    Conflict between rule 60 and token DIV resolved as reduce (%left DIV).
-    Conflict between rule 60 and token MINUS resolved as reduce (MINUS < STAR).
-    Conflict between rule 60 and token PLUS resolved as reduce (PLUS < STAR).
-    Conflict between rule 60 and token EQ resolved as reduce (EQ < STAR).
-    Conflict between rule 60 and token GE resolved as reduce (GE < STAR).
-    Conflict between rule 60 and token GT resolved as reduce (GT < STAR).
-    Conflict between rule 60 and token LE resolved as reduce (LE < STAR).
-    Conflict between rule 60 and token LT resolved as reduce (LT < STAR).
-    Conflict between rule 60 and token MOD resolved as reduce (%left MOD).
-    Conflict between rule 60 and token NE resolved as reduce (NE < STAR).
-    Conflict between rule 60 and token AND resolved as reduce (AND < STAR).
-    Conflict between rule 60 and token OR resolved as reduce (OR < STAR).
+    $default  reduce using rule 39 (statement2)
 
 
 state 113
 
-   50 expr: expr . OR expr
-   51     | expr . AND expr
-   52     | expr . LT expr
-   53     | expr . GT expr
-   54     | expr . EQ expr
-   55     | expr . NE expr
-   56     | expr . LE expr
-   57     | expr . GE expr
-   58     | expr . PLUS expr
-   59     | expr . MINUS expr
-   60     | expr . STAR expr
-   61     | expr . DIV expr  [SEMICOLON, COMMA, STAR, DIV, MINUS, PLUS, EQ, GE, GT, LBRACE, LE, LT, MOD, NE, AND, OR, RPAR, RSQ]
-   61     | expr DIV expr .  [SEMICOLON, COMMA, STAR, DIV, MINUS, PLUS, EQ, GE, GT, LBRACE, LE, LT, MOD, NE, AND, OR, RPAR, RSQ]
-   62     | expr . MOD expr
+   69 expr: LPAR error RPAR .
 
-    $default  reduce using rule 61 (expr)
-
-    Conflict between rule 61 and token STAR resolved as reduce (%left STAR).
-    Conflict between rule 61 and token DIV resolved as reduce (%left DIV).
-    Conflict between rule 61 and token MINUS resolved as reduce (MINUS < DIV).
-    Conflict between rule 61 and token PLUS resolved as reduce (PLUS < DIV).
-    Conflict between rule 61 and token EQ resolved as reduce (EQ < DIV).
-    Conflict between rule 61 and token GE resolved as reduce (GE < DIV).
-    Conflict between rule 61 and token GT resolved as reduce (GT < DIV).
-    Conflict between rule 61 and token LE resolved as reduce (LE < DIV).
-    Conflict between rule 61 and token LT resolved as reduce (LT < DIV).
-    Conflict between rule 61 and token MOD resolved as reduce (%left MOD).
-    Conflict between rule 61 and token NE resolved as reduce (NE < DIV).
-    Conflict between rule 61 and token AND resolved as reduce (AND < DIV).
-    Conflict between rule 61 and token OR resolved as reduce (OR < DIV).
+    $default  reduce using rule 69 (expr)
 
 
 state 114
 
-   50 expr: expr . OR expr
-   51     | expr . AND expr
-   52     | expr . LT expr
-   53     | expr . GT expr
-   54     | expr . EQ expr
-   55     | expr . NE expr
-   56     | expr . LE expr
-   57     | expr . GE expr
-   58     | expr . PLUS expr
-   59     | expr . MINUS expr  [SEMICOLON, COMMA, MINUS, PLUS, EQ, GE, GT, LBRACE, LE, LT, NE, AND, OR, RPAR, RSQ]
-   59     | expr MINUS expr .  [SEMICOLON, COMMA, MINUS, PLUS, EQ, GE, GT, LBRACE, LE, LT, NE, AND, OR, RPAR, RSQ]
-   60     | expr . STAR expr
-   61     | expr . DIV expr
-   62     | expr . MOD expr
+   68 expr: LPAR expr RPAR .
 
-    STAR  shift, and go to state 85
-    DIV   shift, and go to state 86
-    MOD   shift, and go to state 94
-
-    $default  reduce using rule 59 (expr)
-
-    Conflict between rule 59 and token STAR resolved as shift (MINUS < STAR).
-    Conflict between rule 59 and token DIV resolved as shift (MINUS < DIV).
-    Conflict between rule 59 and token MINUS resolved as reduce (%left MINUS).
-    Conflict between rule 59 and token PLUS resolved as reduce (%left PLUS).
-    Conflict between rule 59 and token EQ resolved as reduce (EQ < MINUS).
-    Conflict between rule 59 and token GE resolved as reduce (GE < MINUS).
-    Conflict between rule 59 and token GT resolved as reduce (GT < MINUS).
-    Conflict between rule 59 and token LE resolved as reduce (LE < MINUS).
-    Conflict between rule 59 and token LT resolved as reduce (LT < MINUS).
-    Conflict between rule 59 and token MOD resolved as shift (MINUS < MOD).
-    Conflict between rule 59 and token NE resolved as reduce (NE < MINUS).
-    Conflict between rule 59 and token AND resolved as reduce (AND < MINUS).
-    Conflict between rule 59 and token OR resolved as reduce (OR < MINUS).
+    $default  reduce using rule 68 (expr)
 
 
 state 115
 
-   50 expr: expr . OR expr
-   51     | expr . AND expr
-   52     | expr . LT expr
-   53     | expr . GT expr
-   54     | expr . EQ expr
-   55     | expr . NE expr
-   56     | expr . LE expr
-   57     | expr . GE expr
-   58     | expr . PLUS expr  [SEMICOLON, COMMA, MINUS, PLUS, EQ, GE, GT, LBRACE, LE, LT, NE, AND, OR, RPAR, RSQ]
-   58     | expr PLUS expr .  [SEMICOLON, COMMA, MINUS, PLUS, EQ, GE, GT, LBRACE, LE, LT, NE, AND, OR, RPAR, RSQ]
-   59     | expr . MINUS expr
-   60     | expr . STAR expr
-   61     | expr . DIV expr
-   62     | expr . MOD expr
-
-    STAR  shift, and go to state 85
-    DIV   shift, and go to state 86
-    MOD   shift, and go to state 94
+   48 expr: expr . OR expr
+   49     | expr . AND expr
+   50     | expr . LT expr
+   51     | expr . GT expr
+   52     | expr . EQ expr
+   53     | expr . NE expr
+   54     | expr . LE expr
+   55     | expr . GE expr
+   56     | expr . PLUS expr
+   57     | expr . MINUS expr
+   58     | expr . STAR expr  [SEMICOLON, COMMA, STAR, DIV, MINUS, PLUS, EQ, GE, GT, LBRACE, LE, LT, MOD, NE, AND, OR, RPAR, RSQ]
+   58     | expr STAR expr .  [SEMICOLON, COMMA, STAR, DIV, MINUS, PLUS, EQ, GE, GT, LBRACE, LE, LT, MOD, NE, AND, OR, RPAR, RSQ]
+   59     | expr . DIV expr
+   60     | expr . MOD expr
 
     $default  reduce using rule 58 (expr)
 
-    Conflict between rule 58 and token STAR resolved as shift (PLUS < STAR).
-    Conflict between rule 58 and token DIV resolved as shift (PLUS < DIV).
-    Conflict between rule 58 and token MINUS resolved as reduce (%left MINUS).
-    Conflict between rule 58 and token PLUS resolved as reduce (%left PLUS).
-    Conflict between rule 58 and token EQ resolved as reduce (EQ < PLUS).
-    Conflict between rule 58 and token GE resolved as reduce (GE < PLUS).
-    Conflict between rule 58 and token GT resolved as reduce (GT < PLUS).
-    Conflict between rule 58 and token LE resolved as reduce (LE < PLUS).
-    Conflict between rule 58 and token LT resolved as reduce (LT < PLUS).
-    Conflict between rule 58 and token MOD resolved as shift (PLUS < MOD).
-    Conflict between rule 58 and token NE resolved as reduce (NE < PLUS).
-    Conflict between rule 58 and token AND resolved as reduce (AND < PLUS).
-    Conflict between rule 58 and token OR resolved as reduce (OR < PLUS).
+    Conflict between rule 58 and token STAR resolved as reduce (%left STAR).
+    Conflict between rule 58 and token DIV resolved as reduce (%left DIV).
+    Conflict between rule 58 and token MINUS resolved as reduce (MINUS < STAR).
+    Conflict between rule 58 and token PLUS resolved as reduce (PLUS < STAR).
+    Conflict between rule 58 and token EQ resolved as reduce (EQ < STAR).
+    Conflict between rule 58 and token GE resolved as reduce (GE < STAR).
+    Conflict between rule 58 and token GT resolved as reduce (GT < STAR).
+    Conflict between rule 58 and token LE resolved as reduce (LE < STAR).
+    Conflict between rule 58 and token LT resolved as reduce (LT < STAR).
+    Conflict between rule 58 and token MOD resolved as reduce (%left MOD).
+    Conflict between rule 58 and token NE resolved as reduce (NE < STAR).
+    Conflict between rule 58 and token AND resolved as reduce (AND < STAR).
+    Conflict between rule 58 and token OR resolved as reduce (OR < STAR).
 
 
 state 116
 
-   50 expr: expr . OR expr
-   51     | expr . AND expr
-   52     | expr . LT expr
-   53     | expr . GT expr
-   54     | expr . EQ expr  [SEMICOLON, COMMA, EQ, GE, GT, LBRACE, LE, LT, NE, AND, OR, RPAR, RSQ]
-   54     | expr EQ expr .  [SEMICOLON, COMMA, EQ, GE, GT, LBRACE, LE, LT, NE, AND, OR, RPAR, RSQ]
-   55     | expr . NE expr
-   56     | expr . LE expr
-   57     | expr . GE expr
-   58     | expr . PLUS expr
-   59     | expr . MINUS expr
-   60     | expr . STAR expr
-   61     | expr . DIV expr
-   62     | expr . MOD expr
+   48 expr: expr . OR expr
+   49     | expr . AND expr
+   50     | expr . LT expr
+   51     | expr . GT expr
+   52     | expr . EQ expr
+   53     | expr . NE expr
+   54     | expr . LE expr
+   55     | expr . GE expr
+   56     | expr . PLUS expr
+   57     | expr . MINUS expr
+   58     | expr . STAR expr
+   59     | expr . DIV expr  [SEMICOLON, COMMA, STAR, DIV, MINUS, PLUS, EQ, GE, GT, LBRACE, LE, LT, MOD, NE, AND, OR, RPAR, RSQ]
+   59     | expr DIV expr .  [SEMICOLON, COMMA, STAR, DIV, MINUS, PLUS, EQ, GE, GT, LBRACE, LE, LT, MOD, NE, AND, OR, RPAR, RSQ]
+   60     | expr . MOD expr
 
-    STAR   shift, and go to state 85
-    DIV    shift, and go to state 86
-    MINUS  shift, and go to state 87
-    PLUS   shift, and go to state 88
-    MOD    shift, and go to state 94
+    $default  reduce using rule 59 (expr)
 
-    $default  reduce using rule 54 (expr)
-
-    Conflict between rule 54 and token STAR resolved as shift (EQ < STAR).
-    Conflict between rule 54 and token DIV resolved as shift (EQ < DIV).
-    Conflict between rule 54 and token MINUS resolved as shift (EQ < MINUS).
-    Conflict between rule 54 and token PLUS resolved as shift (EQ < PLUS).
-    Conflict between rule 54 and token EQ resolved as reduce (%left EQ).
-    Conflict between rule 54 and token GE resolved as reduce (%left GE).
-    Conflict between rule 54 and token GT resolved as reduce (%left GT).
-    Conflict between rule 54 and token LE resolved as reduce (%left LE).
-    Conflict between rule 54 and token LT resolved as reduce (%left LT).
-    Conflict between rule 54 and token MOD resolved as shift (EQ < MOD).
-    Conflict between rule 54 and token NE resolved as reduce (%left NE).
-    Conflict between rule 54 and token AND resolved as reduce (AND < EQ).
-    Conflict between rule 54 and token OR resolved as reduce (OR < EQ).
+    Conflict between rule 59 and token STAR resolved as reduce (%left STAR).
+    Conflict between rule 59 and token DIV resolved as reduce (%left DIV).
+    Conflict between rule 59 and token MINUS resolved as reduce (MINUS < DIV).
+    Conflict between rule 59 and token PLUS resolved as reduce (PLUS < DIV).
+    Conflict between rule 59 and token EQ resolved as reduce (EQ < DIV).
+    Conflict between rule 59 and token GE resolved as reduce (GE < DIV).
+    Conflict between rule 59 and token GT resolved as reduce (GT < DIV).
+    Conflict between rule 59 and token LE resolved as reduce (LE < DIV).
+    Conflict between rule 59 and token LT resolved as reduce (LT < DIV).
+    Conflict between rule 59 and token MOD resolved as reduce (%left MOD).
+    Conflict between rule 59 and token NE resolved as reduce (NE < DIV).
+    Conflict between rule 59 and token AND resolved as reduce (AND < DIV).
+    Conflict between rule 59 and token OR resolved as reduce (OR < DIV).
 
 
 state 117
 
-   50 expr: expr . OR expr
-   51     | expr . AND expr
-   52     | expr . LT expr
-   53     | expr . GT expr
-   54     | expr . EQ expr
-   55     | expr . NE expr
-   56     | expr . LE expr
-   57     | expr . GE expr  [SEMICOLON, COMMA, EQ, GE, GT, LBRACE, LE, LT, NE, AND, OR, RPAR, RSQ]
-   57     | expr GE expr .  [SEMICOLON, COMMA, EQ, GE, GT, LBRACE, LE, LT, NE, AND, OR, RPAR, RSQ]
-   58     | expr . PLUS expr
-   59     | expr . MINUS expr
-   60     | expr . STAR expr
-   61     | expr . DIV expr
-   62     | expr . MOD expr
+   48 expr: expr . OR expr
+   49     | expr . AND expr
+   50     | expr . LT expr
+   51     | expr . GT expr
+   52     | expr . EQ expr
+   53     | expr . NE expr
+   54     | expr . LE expr
+   55     | expr . GE expr
+   56     | expr . PLUS expr
+   57     | expr . MINUS expr  [SEMICOLON, COMMA, MINUS, PLUS, EQ, GE, GT, LBRACE, LE, LT, NE, AND, OR, RPAR, RSQ]
+   57     | expr MINUS expr .  [SEMICOLON, COMMA, MINUS, PLUS, EQ, GE, GT, LBRACE, LE, LT, NE, AND, OR, RPAR, RSQ]
+   58     | expr . STAR expr
+   59     | expr . DIV expr
+   60     | expr . MOD expr
 
-    STAR   shift, and go to state 85
-    DIV    shift, and go to state 86
-    MINUS  shift, and go to state 87
-    PLUS   shift, and go to state 88
-    MOD    shift, and go to state 94
+    STAR  shift, and go to state 88
+    DIV   shift, and go to state 89
+    MOD   shift, and go to state 97
 
     $default  reduce using rule 57 (expr)
 
-    Conflict between rule 57 and token STAR resolved as shift (GE < STAR).
-    Conflict between rule 57 and token DIV resolved as shift (GE < DIV).
-    Conflict between rule 57 and token MINUS resolved as shift (GE < MINUS).
-    Conflict between rule 57 and token PLUS resolved as shift (GE < PLUS).
-    Conflict between rule 57 and token EQ resolved as reduce (%left EQ).
-    Conflict between rule 57 and token GE resolved as reduce (%left GE).
-    Conflict between rule 57 and token GT resolved as reduce (%left GT).
-    Conflict between rule 57 and token LE resolved as reduce (%left LE).
-    Conflict between rule 57 and token LT resolved as reduce (%left LT).
-    Conflict between rule 57 and token MOD resolved as shift (GE < MOD).
-    Conflict between rule 57 and token NE resolved as reduce (%left NE).
-    Conflict between rule 57 and token AND resolved as reduce (AND < GE).
-    Conflict between rule 57 and token OR resolved as reduce (OR < GE).
+    Conflict between rule 57 and token STAR resolved as shift (MINUS < STAR).
+    Conflict between rule 57 and token DIV resolved as shift (MINUS < DIV).
+    Conflict between rule 57 and token MINUS resolved as reduce (%left MINUS).
+    Conflict between rule 57 and token PLUS resolved as reduce (%left PLUS).
+    Conflict between rule 57 and token EQ resolved as reduce (EQ < MINUS).
+    Conflict between rule 57 and token GE resolved as reduce (GE < MINUS).
+    Conflict between rule 57 and token GT resolved as reduce (GT < MINUS).
+    Conflict between rule 57 and token LE resolved as reduce (LE < MINUS).
+    Conflict between rule 57 and token LT resolved as reduce (LT < MINUS).
+    Conflict between rule 57 and token MOD resolved as shift (MINUS < MOD).
+    Conflict between rule 57 and token NE resolved as reduce (NE < MINUS).
+    Conflict between rule 57 and token AND resolved as reduce (AND < MINUS).
+    Conflict between rule 57 and token OR resolved as reduce (OR < MINUS).
 
 
 state 118
 
-   50 expr: expr . OR expr
-   51     | expr . AND expr
-   52     | expr . LT expr
-   53     | expr . GT expr  [SEMICOLON, COMMA, EQ, GE, GT, LBRACE, LE, LT, NE, AND, OR, RPAR, RSQ]
-   53     | expr GT expr .  [SEMICOLON, COMMA, EQ, GE, GT, LBRACE, LE, LT, NE, AND, OR, RPAR, RSQ]
-   54     | expr . EQ expr
-   55     | expr . NE expr
-   56     | expr . LE expr
-   57     | expr . GE expr
-   58     | expr . PLUS expr
-   59     | expr . MINUS expr
-   60     | expr . STAR expr
-   61     | expr . DIV expr
-   62     | expr . MOD expr
+   48 expr: expr . OR expr
+   49     | expr . AND expr
+   50     | expr . LT expr
+   51     | expr . GT expr
+   52     | expr . EQ expr
+   53     | expr . NE expr
+   54     | expr . LE expr
+   55     | expr . GE expr
+   56     | expr . PLUS expr  [SEMICOLON, COMMA, MINUS, PLUS, EQ, GE, GT, LBRACE, LE, LT, NE, AND, OR, RPAR, RSQ]
+   56     | expr PLUS expr .  [SEMICOLON, COMMA, MINUS, PLUS, EQ, GE, GT, LBRACE, LE, LT, NE, AND, OR, RPAR, RSQ]
+   57     | expr . MINUS expr
+   58     | expr . STAR expr
+   59     | expr . DIV expr
+   60     | expr . MOD expr
 
-    STAR   shift, and go to state 85
-    DIV    shift, and go to state 86
-    MINUS  shift, and go to state 87
-    PLUS   shift, and go to state 88
-    MOD    shift, and go to state 94
+    STAR  shift, and go to state 88
+    DIV   shift, and go to state 89
+    MOD   shift, and go to state 97
 
-    $default  reduce using rule 53 (expr)
+    $default  reduce using rule 56 (expr)
 
-    Conflict between rule 53 and token STAR resolved as shift (GT < STAR).
-    Conflict between rule 53 and token DIV resolved as shift (GT < DIV).
-    Conflict between rule 53 and token MINUS resolved as shift (GT < MINUS).
-    Conflict between rule 53 and token PLUS resolved as shift (GT < PLUS).
-    Conflict between rule 53 and token EQ resolved as reduce (%left EQ).
-    Conflict between rule 53 and token GE resolved as reduce (%left GE).
-    Conflict between rule 53 and token GT resolved as reduce (%left GT).
-    Conflict between rule 53 and token LE resolved as reduce (%left LE).
-    Conflict between rule 53 and token LT resolved as reduce (%left LT).
-    Conflict between rule 53 and token MOD resolved as shift (GT < MOD).
-    Conflict between rule 53 and token NE resolved as reduce (%left NE).
-    Conflict between rule 53 and token AND resolved as reduce (AND < GT).
-    Conflict between rule 53 and token OR resolved as reduce (OR < GT).
+    Conflict between rule 56 and token STAR resolved as shift (PLUS < STAR).
+    Conflict between rule 56 and token DIV resolved as shift (PLUS < DIV).
+    Conflict between rule 56 and token MINUS resolved as reduce (%left MINUS).
+    Conflict between rule 56 and token PLUS resolved as reduce (%left PLUS).
+    Conflict between rule 56 and token EQ resolved as reduce (EQ < PLUS).
+    Conflict between rule 56 and token GE resolved as reduce (GE < PLUS).
+    Conflict between rule 56 and token GT resolved as reduce (GT < PLUS).
+    Conflict between rule 56 and token LE resolved as reduce (LE < PLUS).
+    Conflict between rule 56 and token LT resolved as reduce (LT < PLUS).
+    Conflict between rule 56 and token MOD resolved as shift (PLUS < MOD).
+    Conflict between rule 56 and token NE resolved as reduce (NE < PLUS).
+    Conflict between rule 56 and token AND resolved as reduce (AND < PLUS).
+    Conflict between rule 56 and token OR resolved as reduce (OR < PLUS).
 
 
 state 119
 
-   50 expr: expr . OR expr
-   51     | expr . AND expr
-   52     | expr . LT expr
-   53     | expr . GT expr
-   54     | expr . EQ expr
-   55     | expr . NE expr
-   56     | expr . LE expr  [SEMICOLON, COMMA, EQ, GE, GT, LBRACE, LE, LT, NE, AND, OR, RPAR, RSQ]
-   56     | expr LE expr .  [SEMICOLON, COMMA, EQ, GE, GT, LBRACE, LE, LT, NE, AND, OR, RPAR, RSQ]
-   57     | expr . GE expr
-   58     | expr . PLUS expr
-   59     | expr . MINUS expr
-   60     | expr . STAR expr
-   61     | expr . DIV expr
-   62     | expr . MOD expr
+   48 expr: expr . OR expr
+   49     | expr . AND expr
+   50     | expr . LT expr
+   51     | expr . GT expr
+   52     | expr . EQ expr  [SEMICOLON, COMMA, EQ, GE, GT, LBRACE, LE, LT, NE, AND, OR, RPAR, RSQ]
+   52     | expr EQ expr .  [SEMICOLON, COMMA, EQ, GE, GT, LBRACE, LE, LT, NE, AND, OR, RPAR, RSQ]
+   53     | expr . NE expr
+   54     | expr . LE expr
+   55     | expr . GE expr
+   56     | expr . PLUS expr
+   57     | expr . MINUS expr
+   58     | expr . STAR expr
+   59     | expr . DIV expr
+   60     | expr . MOD expr
 
-    STAR   shift, and go to state 85
-    DIV    shift, and go to state 86
-    MINUS  shift, and go to state 87
-    PLUS   shift, and go to state 88
-    MOD    shift, and go to state 94
-
-    $default  reduce using rule 56 (expr)
-
-    Conflict between rule 56 and token STAR resolved as shift (LE < STAR).
-    Conflict between rule 56 and token DIV resolved as shift (LE < DIV).
-    Conflict between rule 56 and token MINUS resolved as shift (LE < MINUS).
-    Conflict between rule 56 and token PLUS resolved as shift (LE < PLUS).
-    Conflict between rule 56 and token EQ resolved as reduce (%left EQ).
-    Conflict between rule 56 and token GE resolved as reduce (%left GE).
-    Conflict between rule 56 and token GT resolved as reduce (%left GT).
-    Conflict between rule 56 and token LE resolved as reduce (%left LE).
-    Conflict between rule 56 and token LT resolved as reduce (%left LT).
-    Conflict between rule 56 and token MOD resolved as shift (LE < MOD).
-    Conflict between rule 56 and token NE resolved as reduce (%left NE).
-    Conflict between rule 56 and token AND resolved as reduce (AND < LE).
-    Conflict between rule 56 and token OR resolved as reduce (OR < LE).
-
-
-state 120
-
-   50 expr: expr . OR expr
-   51     | expr . AND expr
-   52     | expr . LT expr  [SEMICOLON, COMMA, EQ, GE, GT, LBRACE, LE, LT, NE, AND, OR, RPAR, RSQ]
-   52     | expr LT expr .  [SEMICOLON, COMMA, EQ, GE, GT, LBRACE, LE, LT, NE, AND, OR, RPAR, RSQ]
-   53     | expr . GT expr
-   54     | expr . EQ expr
-   55     | expr . NE expr
-   56     | expr . LE expr
-   57     | expr . GE expr
-   58     | expr . PLUS expr
-   59     | expr . MINUS expr
-   60     | expr . STAR expr
-   61     | expr . DIV expr
-   62     | expr . MOD expr
-
-    STAR   shift, and go to state 85
-    DIV    shift, and go to state 86
-    MINUS  shift, and go to state 87
-    PLUS   shift, and go to state 88
-    MOD    shift, and go to state 94
+    STAR   shift, and go to state 88
+    DIV    shift, and go to state 89
+    MINUS  shift, and go to state 90
+    PLUS   shift, and go to state 91
+    MOD    shift, and go to state 97
 
     $default  reduce using rule 52 (expr)
 
-    Conflict between rule 52 and token STAR resolved as shift (LT < STAR).
-    Conflict between rule 52 and token DIV resolved as shift (LT < DIV).
-    Conflict between rule 52 and token MINUS resolved as shift (LT < MINUS).
-    Conflict between rule 52 and token PLUS resolved as shift (LT < PLUS).
+    Conflict between rule 52 and token STAR resolved as shift (EQ < STAR).
+    Conflict between rule 52 and token DIV resolved as shift (EQ < DIV).
+    Conflict between rule 52 and token MINUS resolved as shift (EQ < MINUS).
+    Conflict between rule 52 and token PLUS resolved as shift (EQ < PLUS).
     Conflict between rule 52 and token EQ resolved as reduce (%left EQ).
     Conflict between rule 52 and token GE resolved as reduce (%left GE).
     Conflict between rule 52 and token GT resolved as reduce (%left GT).
     Conflict between rule 52 and token LE resolved as reduce (%left LE).
     Conflict between rule 52 and token LT resolved as reduce (%left LT).
-    Conflict between rule 52 and token MOD resolved as shift (LT < MOD).
+    Conflict between rule 52 and token MOD resolved as shift (EQ < MOD).
     Conflict between rule 52 and token NE resolved as reduce (%left NE).
-    Conflict between rule 52 and token AND resolved as reduce (AND < LT).
-    Conflict between rule 52 and token OR resolved as reduce (OR < LT).
+    Conflict between rule 52 and token AND resolved as reduce (AND < EQ).
+    Conflict between rule 52 and token OR resolved as reduce (OR < EQ).
 
 
-state 121
+state 120
 
-   50 expr: expr . OR expr
-   51     | expr . AND expr
-   52     | expr . LT expr
-   53     | expr . GT expr
-   54     | expr . EQ expr
-   55     | expr . NE expr
-   56     | expr . LE expr
-   57     | expr . GE expr
-   58     | expr . PLUS expr
-   59     | expr . MINUS expr
-   60     | expr . STAR expr
-   61     | expr . DIV expr
-   62     | expr . MOD expr  [SEMICOLON, COMMA, STAR, DIV, MINUS, PLUS, EQ, GE, GT, LBRACE, LE, LT, MOD, NE, AND, OR, RPAR, RSQ]
-   62     | expr MOD expr .  [SEMICOLON, COMMA, STAR, DIV, MINUS, PLUS, EQ, GE, GT, LBRACE, LE, LT, MOD, NE, AND, OR, RPAR, RSQ]
+   48 expr: expr . OR expr
+   49     | expr . AND expr
+   50     | expr . LT expr
+   51     | expr . GT expr
+   52     | expr . EQ expr
+   53     | expr . NE expr
+   54     | expr . LE expr
+   55     | expr . GE expr  [SEMICOLON, COMMA, EQ, GE, GT, LBRACE, LE, LT, NE, AND, OR, RPAR, RSQ]
+   55     | expr GE expr .  [SEMICOLON, COMMA, EQ, GE, GT, LBRACE, LE, LT, NE, AND, OR, RPAR, RSQ]
+   56     | expr . PLUS expr
+   57     | expr . MINUS expr
+   58     | expr . STAR expr
+   59     | expr . DIV expr
+   60     | expr . MOD expr
 
-    $default  reduce using rule 62 (expr)
-
-    Conflict between rule 62 and token STAR resolved as reduce (%left STAR).
-    Conflict between rule 62 and token DIV resolved as reduce (%left DIV).
-    Conflict between rule 62 and token MINUS resolved as reduce (MINUS < MOD).
-    Conflict between rule 62 and token PLUS resolved as reduce (PLUS < MOD).
-    Conflict between rule 62 and token EQ resolved as reduce (EQ < MOD).
-    Conflict between rule 62 and token GE resolved as reduce (GE < MOD).
-    Conflict between rule 62 and token GT resolved as reduce (GT < MOD).
-    Conflict between rule 62 and token LE resolved as reduce (LE < MOD).
-    Conflict between rule 62 and token LT resolved as reduce (LT < MOD).
-    Conflict between rule 62 and token MOD resolved as reduce (%left MOD).
-    Conflict between rule 62 and token NE resolved as reduce (NE < MOD).
-    Conflict between rule 62 and token AND resolved as reduce (AND < MOD).
-    Conflict between rule 62 and token OR resolved as reduce (OR < MOD).
-
-
-state 122
-
-   50 expr: expr . OR expr
-   51     | expr . AND expr
-   52     | expr . LT expr
-   53     | expr . GT expr
-   54     | expr . EQ expr
-   55     | expr . NE expr  [SEMICOLON, COMMA, EQ, GE, GT, LBRACE, LE, LT, NE, AND, OR, RPAR, RSQ]
-   55     | expr NE expr .  [SEMICOLON, COMMA, EQ, GE, GT, LBRACE, LE, LT, NE, AND, OR, RPAR, RSQ]
-   56     | expr . LE expr
-   57     | expr . GE expr
-   58     | expr . PLUS expr
-   59     | expr . MINUS expr
-   60     | expr . STAR expr
-   61     | expr . DIV expr
-   62     | expr . MOD expr
-
-    STAR   shift, and go to state 85
-    DIV    shift, and go to state 86
-    MINUS  shift, and go to state 87
-    PLUS   shift, and go to state 88
-    MOD    shift, and go to state 94
+    STAR   shift, and go to state 88
+    DIV    shift, and go to state 89
+    MINUS  shift, and go to state 90
+    PLUS   shift, and go to state 91
+    MOD    shift, and go to state 97
 
     $default  reduce using rule 55 (expr)
 
-    Conflict between rule 55 and token STAR resolved as shift (NE < STAR).
-    Conflict between rule 55 and token DIV resolved as shift (NE < DIV).
-    Conflict between rule 55 and token MINUS resolved as shift (NE < MINUS).
-    Conflict between rule 55 and token PLUS resolved as shift (NE < PLUS).
+    Conflict between rule 55 and token STAR resolved as shift (GE < STAR).
+    Conflict between rule 55 and token DIV resolved as shift (GE < DIV).
+    Conflict between rule 55 and token MINUS resolved as shift (GE < MINUS).
+    Conflict between rule 55 and token PLUS resolved as shift (GE < PLUS).
     Conflict between rule 55 and token EQ resolved as reduce (%left EQ).
     Conflict between rule 55 and token GE resolved as reduce (%left GE).
     Conflict between rule 55 and token GT resolved as reduce (%left GT).
     Conflict between rule 55 and token LE resolved as reduce (%left LE).
     Conflict between rule 55 and token LT resolved as reduce (%left LT).
-    Conflict between rule 55 and token MOD resolved as shift (NE < MOD).
+    Conflict between rule 55 and token MOD resolved as shift (GE < MOD).
     Conflict between rule 55 and token NE resolved as reduce (%left NE).
-    Conflict between rule 55 and token AND resolved as reduce (AND < NE).
-    Conflict between rule 55 and token OR resolved as reduce (OR < NE).
+    Conflict between rule 55 and token AND resolved as reduce (AND < GE).
+    Conflict between rule 55 and token OR resolved as reduce (OR < GE).
+
+
+state 121
+
+   48 expr: expr . OR expr
+   49     | expr . AND expr
+   50     | expr . LT expr
+   51     | expr . GT expr  [SEMICOLON, COMMA, EQ, GE, GT, LBRACE, LE, LT, NE, AND, OR, RPAR, RSQ]
+   51     | expr GT expr .  [SEMICOLON, COMMA, EQ, GE, GT, LBRACE, LE, LT, NE, AND, OR, RPAR, RSQ]
+   52     | expr . EQ expr
+   53     | expr . NE expr
+   54     | expr . LE expr
+   55     | expr . GE expr
+   56     | expr . PLUS expr
+   57     | expr . MINUS expr
+   58     | expr . STAR expr
+   59     | expr . DIV expr
+   60     | expr . MOD expr
+
+    STAR   shift, and go to state 88
+    DIV    shift, and go to state 89
+    MINUS  shift, and go to state 90
+    PLUS   shift, and go to state 91
+    MOD    shift, and go to state 97
+
+    $default  reduce using rule 51 (expr)
+
+    Conflict between rule 51 and token STAR resolved as shift (GT < STAR).
+    Conflict between rule 51 and token DIV resolved as shift (GT < DIV).
+    Conflict between rule 51 and token MINUS resolved as shift (GT < MINUS).
+    Conflict between rule 51 and token PLUS resolved as shift (GT < PLUS).
+    Conflict between rule 51 and token EQ resolved as reduce (%left EQ).
+    Conflict between rule 51 and token GE resolved as reduce (%left GE).
+    Conflict between rule 51 and token GT resolved as reduce (%left GT).
+    Conflict between rule 51 and token LE resolved as reduce (%left LE).
+    Conflict between rule 51 and token LT resolved as reduce (%left LT).
+    Conflict between rule 51 and token MOD resolved as shift (GT < MOD).
+    Conflict between rule 51 and token NE resolved as reduce (%left NE).
+    Conflict between rule 51 and token AND resolved as reduce (AND < GT).
+    Conflict between rule 51 and token OR resolved as reduce (OR < GT).
+
+
+state 122
+
+   48 expr: expr . OR expr
+   49     | expr . AND expr
+   50     | expr . LT expr
+   51     | expr . GT expr
+   52     | expr . EQ expr
+   53     | expr . NE expr
+   54     | expr . LE expr  [SEMICOLON, COMMA, EQ, GE, GT, LBRACE, LE, LT, NE, AND, OR, RPAR, RSQ]
+   54     | expr LE expr .  [SEMICOLON, COMMA, EQ, GE, GT, LBRACE, LE, LT, NE, AND, OR, RPAR, RSQ]
+   55     | expr . GE expr
+   56     | expr . PLUS expr
+   57     | expr . MINUS expr
+   58     | expr . STAR expr
+   59     | expr . DIV expr
+   60     | expr . MOD expr
+
+    STAR   shift, and go to state 88
+    DIV    shift, and go to state 89
+    MINUS  shift, and go to state 90
+    PLUS   shift, and go to state 91
+    MOD    shift, and go to state 97
+
+    $default  reduce using rule 54 (expr)
+
+    Conflict between rule 54 and token STAR resolved as shift (LE < STAR).
+    Conflict between rule 54 and token DIV resolved as shift (LE < DIV).
+    Conflict between rule 54 and token MINUS resolved as shift (LE < MINUS).
+    Conflict between rule 54 and token PLUS resolved as shift (LE < PLUS).
+    Conflict between rule 54 and token EQ resolved as reduce (%left EQ).
+    Conflict between rule 54 and token GE resolved as reduce (%left GE).
+    Conflict between rule 54 and token GT resolved as reduce (%left GT).
+    Conflict between rule 54 and token LE resolved as reduce (%left LE).
+    Conflict between rule 54 and token LT resolved as reduce (%left LT).
+    Conflict between rule 54 and token MOD resolved as shift (LE < MOD).
+    Conflict between rule 54 and token NE resolved as reduce (%left NE).
+    Conflict between rule 54 and token AND resolved as reduce (AND < LE).
+    Conflict between rule 54 and token OR resolved as reduce (OR < LE).
 
 
 state 123
 
-   50 expr: expr . OR expr
-   51     | expr . AND expr  [SEMICOLON, COMMA, LBRACE, AND, OR, RPAR, RSQ]
-   51     | expr AND expr .  [SEMICOLON, COMMA, LBRACE, AND, OR, RPAR, RSQ]
-   52     | expr . LT expr
-   53     | expr . GT expr
-   54     | expr . EQ expr
-   55     | expr . NE expr
-   56     | expr . LE expr
-   57     | expr . GE expr
-   58     | expr . PLUS expr
-   59     | expr . MINUS expr
-   60     | expr . STAR expr
-   61     | expr . DIV expr
-   62     | expr . MOD expr
+   48 expr: expr . OR expr
+   49     | expr . AND expr
+   50     | expr . LT expr  [SEMICOLON, COMMA, EQ, GE, GT, LBRACE, LE, LT, NE, AND, OR, RPAR, RSQ]
+   50     | expr LT expr .  [SEMICOLON, COMMA, EQ, GE, GT, LBRACE, LE, LT, NE, AND, OR, RPAR, RSQ]
+   51     | expr . GT expr
+   52     | expr . EQ expr
+   53     | expr . NE expr
+   54     | expr . LE expr
+   55     | expr . GE expr
+   56     | expr . PLUS expr
+   57     | expr . MINUS expr
+   58     | expr . STAR expr
+   59     | expr . DIV expr
+   60     | expr . MOD expr
 
-    STAR   shift, and go to state 85
-    DIV    shift, and go to state 86
-    MINUS  shift, and go to state 87
-    PLUS   shift, and go to state 88
-    EQ     shift, and go to state 89
-    GE     shift, and go to state 90
-    GT     shift, and go to state 91
-    LE     shift, and go to state 92
-    LT     shift, and go to state 93
-    MOD    shift, and go to state 94
-    NE     shift, and go to state 95
+    STAR   shift, and go to state 88
+    DIV    shift, and go to state 89
+    MINUS  shift, and go to state 90
+    PLUS   shift, and go to state 91
+    MOD    shift, and go to state 97
 
-    $default  reduce using rule 51 (expr)
+    $default  reduce using rule 50 (expr)
 
-    Conflict between rule 51 and token STAR resolved as shift (AND < STAR).
-    Conflict between rule 51 and token DIV resolved as shift (AND < DIV).
-    Conflict between rule 51 and token MINUS resolved as shift (AND < MINUS).
-    Conflict between rule 51 and token PLUS resolved as shift (AND < PLUS).
-    Conflict between rule 51 and token EQ resolved as shift (AND < EQ).
-    Conflict between rule 51 and token GE resolved as shift (AND < GE).
-    Conflict between rule 51 and token GT resolved as shift (AND < GT).
-    Conflict between rule 51 and token LE resolved as shift (AND < LE).
-    Conflict between rule 51 and token LT resolved as shift (AND < LT).
-    Conflict between rule 51 and token MOD resolved as shift (AND < MOD).
-    Conflict between rule 51 and token NE resolved as shift (AND < NE).
-    Conflict between rule 51 and token AND resolved as reduce (%left AND).
-    Conflict between rule 51 and token OR resolved as reduce (OR < AND).
+    Conflict between rule 50 and token STAR resolved as shift (LT < STAR).
+    Conflict between rule 50 and token DIV resolved as shift (LT < DIV).
+    Conflict between rule 50 and token MINUS resolved as shift (LT < MINUS).
+    Conflict between rule 50 and token PLUS resolved as shift (LT < PLUS).
+    Conflict between rule 50 and token EQ resolved as reduce (%left EQ).
+    Conflict between rule 50 and token GE resolved as reduce (%left GE).
+    Conflict between rule 50 and token GT resolved as reduce (%left GT).
+    Conflict between rule 50 and token LE resolved as reduce (%left LE).
+    Conflict between rule 50 and token LT resolved as reduce (%left LT).
+    Conflict between rule 50 and token MOD resolved as shift (LT < MOD).
+    Conflict between rule 50 and token NE resolved as reduce (%left NE).
+    Conflict between rule 50 and token AND resolved as reduce (AND < LT).
+    Conflict between rule 50 and token OR resolved as reduce (OR < LT).
 
 
 state 124
 
-   50 expr: expr . OR expr  [SEMICOLON, COMMA, LBRACE, OR, RPAR, RSQ]
-   50     | expr OR expr .  [SEMICOLON, COMMA, LBRACE, OR, RPAR, RSQ]
-   51     | expr . AND expr
-   52     | expr . LT expr
-   53     | expr . GT expr
-   54     | expr . EQ expr
-   55     | expr . NE expr
-   56     | expr . LE expr
-   57     | expr . GE expr
-   58     | expr . PLUS expr
-   59     | expr . MINUS expr
-   60     | expr . STAR expr
-   61     | expr . DIV expr
-   62     | expr . MOD expr
+   48 expr: expr . OR expr
+   49     | expr . AND expr
+   50     | expr . LT expr
+   51     | expr . GT expr
+   52     | expr . EQ expr
+   53     | expr . NE expr
+   54     | expr . LE expr
+   55     | expr . GE expr
+   56     | expr . PLUS expr
+   57     | expr . MINUS expr
+   58     | expr . STAR expr
+   59     | expr . DIV expr
+   60     | expr . MOD expr  [SEMICOLON, COMMA, STAR, DIV, MINUS, PLUS, EQ, GE, GT, LBRACE, LE, LT, MOD, NE, AND, OR, RPAR, RSQ]
+   60     | expr MOD expr .  [SEMICOLON, COMMA, STAR, DIV, MINUS, PLUS, EQ, GE, GT, LBRACE, LE, LT, MOD, NE, AND, OR, RPAR, RSQ]
 
-    STAR   shift, and go to state 85
-    DIV    shift, and go to state 86
-    MINUS  shift, and go to state 87
-    PLUS   shift, and go to state 88
-    EQ     shift, and go to state 89
-    GE     shift, and go to state 90
-    GT     shift, and go to state 91
-    LE     shift, and go to state 92
-    LT     shift, and go to state 93
-    MOD    shift, and go to state 94
-    NE     shift, and go to state 95
-    AND    shift, and go to state 96
+    $default  reduce using rule 60 (expr)
 
-    $default  reduce using rule 50 (expr)
-
-    Conflict between rule 50 and token STAR resolved as shift (OR < STAR).
-    Conflict between rule 50 and token DIV resolved as shift (OR < DIV).
-    Conflict between rule 50 and token MINUS resolved as shift (OR < MINUS).
-    Conflict between rule 50 and token PLUS resolved as shift (OR < PLUS).
-    Conflict between rule 50 and token EQ resolved as shift (OR < EQ).
-    Conflict between rule 50 and token GE resolved as shift (OR < GE).
-    Conflict between rule 50 and token GT resolved as shift (OR < GT).
-    Conflict between rule 50 and token LE resolved as shift (OR < LE).
-    Conflict between rule 50 and token LT resolved as shift (OR < LT).
-    Conflict between rule 50 and token MOD resolved as shift (OR < MOD).
-    Conflict between rule 50 and token NE resolved as shift (OR < NE).
-    Conflict between rule 50 and token AND resolved as shift (OR < AND).
-    Conflict between rule 50 and token OR resolved as reduce (%left OR).
+    Conflict between rule 60 and token STAR resolved as reduce (%left STAR).
+    Conflict between rule 60 and token DIV resolved as reduce (%left DIV).
+    Conflict between rule 60 and token MINUS resolved as reduce (MINUS < MOD).
+    Conflict between rule 60 and token PLUS resolved as reduce (PLUS < MOD).
+    Conflict between rule 60 and token EQ resolved as reduce (EQ < MOD).
+    Conflict between rule 60 and token GE resolved as reduce (GE < MOD).
+    Conflict between rule 60 and token GT resolved as reduce (GT < MOD).
+    Conflict between rule 60 and token LE resolved as reduce (LE < MOD).
+    Conflict between rule 60 and token LT resolved as reduce (LT < MOD).
+    Conflict between rule 60 and token MOD resolved as reduce (%left MOD).
+    Conflict between rule 60 and token NE resolved as reduce (NE < MOD).
+    Conflict between rule 60 and token AND resolved as reduce (AND < MOD).
+    Conflict between rule 60 and token OR resolved as reduce (OR < MOD).
 
 
 state 125
 
-   33 statement: FOR LBRACE statement2 RBRACE .
+   48 expr: expr . OR expr
+   49     | expr . AND expr
+   50     | expr . LT expr
+   51     | expr . GT expr
+   52     | expr . EQ expr
+   53     | expr . NE expr  [SEMICOLON, COMMA, EQ, GE, GT, LBRACE, LE, LT, NE, AND, OR, RPAR, RSQ]
+   53     | expr NE expr .  [SEMICOLON, COMMA, EQ, GE, GT, LBRACE, LE, LT, NE, AND, OR, RPAR, RSQ]
+   54     | expr . LE expr
+   55     | expr . GE expr
+   56     | expr . PLUS expr
+   57     | expr . MINUS expr
+   58     | expr . STAR expr
+   59     | expr . DIV expr
+   60     | expr . MOD expr
 
-    $default  reduce using rule 33 (statement)
+    STAR   shift, and go to state 88
+    DIV    shift, and go to state 89
+    MINUS  shift, and go to state 90
+    PLUS   shift, and go to state 91
+    MOD    shift, and go to state 97
+
+    $default  reduce using rule 53 (expr)
+
+    Conflict between rule 53 and token STAR resolved as shift (NE < STAR).
+    Conflict between rule 53 and token DIV resolved as shift (NE < DIV).
+    Conflict between rule 53 and token MINUS resolved as shift (NE < MINUS).
+    Conflict between rule 53 and token PLUS resolved as shift (NE < PLUS).
+    Conflict between rule 53 and token EQ resolved as reduce (%left EQ).
+    Conflict between rule 53 and token GE resolved as reduce (%left GE).
+    Conflict between rule 53 and token GT resolved as reduce (%left GT).
+    Conflict between rule 53 and token LE resolved as reduce (%left LE).
+    Conflict between rule 53 and token LT resolved as reduce (%left LT).
+    Conflict between rule 53 and token MOD resolved as shift (NE < MOD).
+    Conflict between rule 53 and token NE resolved as reduce (%left NE).
+    Conflict between rule 53 and token AND resolved as reduce (AND < NE).
+    Conflict between rule 53 and token OR resolved as reduce (OR < NE).
 
 
 state 126
 
-   28 statement: . IDENTIFIER ASSIGN expr
-   29          | . LBRACE statement2 RBRACE
-   30          | . IF expr LBRACE statement2 RBRACE ELSE LBRACE statement2 RBRACE
-   31          | . IF expr LBRACE statement2 RBRACE
-   32          | . FOR expr LBRACE statement2 RBRACE
-   32          | FOR expr LBRACE statement2 . RBRACE
-   33          | . FOR LBRACE statement2 RBRACE
-   34          | . RETURN expr
-   35          | . RETURN
-   36          | . funcinvocation
-   37          | . parseargs
-   38          | . PRINT LPAR expr RPAR
-   39          | . PRINT LPAR STRLIT RPAR
-   40          | . error
-   41 statement2: statement2 . statement SEMICOLON
-   43 parseargs: . IDENTIFIER COMMA BLANKID ASSIGN PARSEINT LPAR CMDARGS LSQ expr RSQ RPAR
-   44          | . IDENTIFIER COMMA BLANKID ASSIGN PARSEINT LPAR error RPAR
-   45 funcinvocation: . IDENTIFIER LPAR expr funcinvocation2 RPAR
-   46               | . IDENTIFIER LPAR RPAR
-   47               | . IDENTIFIER LPAR error RPAR
+   48 expr: expr . OR expr
+   49     | expr . AND expr  [SEMICOLON, COMMA, LBRACE, AND, OR, RPAR, RSQ]
+   49     | expr AND expr .  [SEMICOLON, COMMA, LBRACE, AND, OR, RPAR, RSQ]
+   50     | expr . LT expr
+   51     | expr . GT expr
+   52     | expr . EQ expr
+   53     | expr . NE expr
+   54     | expr . LE expr
+   55     | expr . GE expr
+   56     | expr . PLUS expr
+   57     | expr . MINUS expr
+   58     | expr . STAR expr
+   59     | expr . DIV expr
+   60     | expr . MOD expr
 
-    error       shift, and go to state 41
-    LBRACE      shift, and go to state 43
-    RBRACE      shift, and go to state 135
-    RETURN      shift, and go to state 45
-    FOR         shift, and go to state 46
-    IF          shift, and go to state 47
-    PRINT       shift, and go to state 48
-    IDENTIFIER  shift, and go to state 49
+    STAR   shift, and go to state 88
+    DIV    shift, and go to state 89
+    MINUS  shift, and go to state 90
+    PLUS   shift, and go to state 91
+    EQ     shift, and go to state 92
+    GE     shift, and go to state 93
+    GT     shift, and go to state 94
+    LE     shift, and go to state 95
+    LT     shift, and go to state 96
+    MOD    shift, and go to state 97
+    NE     shift, and go to state 98
 
-    statement       go to state 79
-    parseargs       go to state 52
-    funcinvocation  go to state 53
+    $default  reduce using rule 49 (expr)
+
+    Conflict between rule 49 and token STAR resolved as shift (AND < STAR).
+    Conflict between rule 49 and token DIV resolved as shift (AND < DIV).
+    Conflict between rule 49 and token MINUS resolved as shift (AND < MINUS).
+    Conflict between rule 49 and token PLUS resolved as shift (AND < PLUS).
+    Conflict between rule 49 and token EQ resolved as shift (AND < EQ).
+    Conflict between rule 49 and token GE resolved as shift (AND < GE).
+    Conflict between rule 49 and token GT resolved as shift (AND < GT).
+    Conflict between rule 49 and token LE resolved as shift (AND < LE).
+    Conflict between rule 49 and token LT resolved as shift (AND < LT).
+    Conflict between rule 49 and token MOD resolved as shift (AND < MOD).
+    Conflict between rule 49 and token NE resolved as shift (AND < NE).
+    Conflict between rule 49 and token AND resolved as reduce (%left AND).
+    Conflict between rule 49 and token OR resolved as reduce (OR < AND).
 
 
 state 127
 
-   28 statement: . IDENTIFIER ASSIGN expr
-   29          | . LBRACE statement2 RBRACE
-   30          | . IF expr LBRACE statement2 RBRACE ELSE LBRACE statement2 RBRACE
-   30          | IF expr LBRACE statement2 . RBRACE ELSE LBRACE statement2 RBRACE
-   31          | . IF expr LBRACE statement2 RBRACE
-   31          | IF expr LBRACE statement2 . RBRACE
-   32          | . FOR expr LBRACE statement2 RBRACE
-   33          | . FOR LBRACE statement2 RBRACE
-   34          | . RETURN expr
-   35          | . RETURN
-   36          | . funcinvocation
-   37          | . parseargs
-   38          | . PRINT LPAR expr RPAR
-   39          | . PRINT LPAR STRLIT RPAR
-   40          | . error
-   41 statement2: statement2 . statement SEMICOLON
-   43 parseargs: . IDENTIFIER COMMA BLANKID ASSIGN PARSEINT LPAR CMDARGS LSQ expr RSQ RPAR
-   44          | . IDENTIFIER COMMA BLANKID ASSIGN PARSEINT LPAR error RPAR
-   45 funcinvocation: . IDENTIFIER LPAR expr funcinvocation2 RPAR
-   46               | . IDENTIFIER LPAR RPAR
-   47               | . IDENTIFIER LPAR error RPAR
+   48 expr: expr . OR expr  [SEMICOLON, COMMA, LBRACE, OR, RPAR, RSQ]
+   48     | expr OR expr .  [SEMICOLON, COMMA, LBRACE, OR, RPAR, RSQ]
+   49     | expr . AND expr
+   50     | expr . LT expr
+   51     | expr . GT expr
+   52     | expr . EQ expr
+   53     | expr . NE expr
+   54     | expr . LE expr
+   55     | expr . GE expr
+   56     | expr . PLUS expr
+   57     | expr . MINUS expr
+   58     | expr . STAR expr
+   59     | expr . DIV expr
+   60     | expr . MOD expr
 
-    error       shift, and go to state 41
-    LBRACE      shift, and go to state 43
-    RBRACE      shift, and go to state 136
-    RETURN      shift, and go to state 45
-    FOR         shift, and go to state 46
-    IF          shift, and go to state 47
-    PRINT       shift, and go to state 48
-    IDENTIFIER  shift, and go to state 49
+    STAR   shift, and go to state 88
+    DIV    shift, and go to state 89
+    MINUS  shift, and go to state 90
+    PLUS   shift, and go to state 91
+    EQ     shift, and go to state 92
+    GE     shift, and go to state 93
+    GT     shift, and go to state 94
+    LE     shift, and go to state 95
+    LT     shift, and go to state 96
+    MOD    shift, and go to state 97
+    NE     shift, and go to state 98
+    AND    shift, and go to state 99
 
-    statement       go to state 79
-    parseargs       go to state 52
-    funcinvocation  go to state 53
+    $default  reduce using rule 48 (expr)
+
+    Conflict between rule 48 and token STAR resolved as shift (OR < STAR).
+    Conflict between rule 48 and token DIV resolved as shift (OR < DIV).
+    Conflict between rule 48 and token MINUS resolved as shift (OR < MINUS).
+    Conflict between rule 48 and token PLUS resolved as shift (OR < PLUS).
+    Conflict between rule 48 and token EQ resolved as shift (OR < EQ).
+    Conflict between rule 48 and token GE resolved as shift (OR < GE).
+    Conflict between rule 48 and token GT resolved as shift (OR < GT).
+    Conflict between rule 48 and token LE resolved as shift (OR < LE).
+    Conflict between rule 48 and token LT resolved as shift (OR < LT).
+    Conflict between rule 48 and token MOD resolved as shift (OR < MOD).
+    Conflict between rule 48 and token NE resolved as shift (OR < NE).
+    Conflict between rule 48 and token AND resolved as shift (OR < AND).
+    Conflict between rule 48 and token OR resolved as reduce (%left OR).
 
 
 state 128
 
-   39 statement: PRINT LPAR STRLIT RPAR .
-
-    $default  reduce using rule 39 (statement)
-
-
-state 129
-
-   38 statement: PRINT LPAR expr RPAR .
-
-    $default  reduce using rule 38 (statement)
-
-
-state 130
-
-   43 parseargs: IDENTIFIER COMMA BLANKID ASSIGN . PARSEINT LPAR CMDARGS LSQ expr RSQ RPAR
-   44          | IDENTIFIER COMMA BLANKID ASSIGN . PARSEINT LPAR error RPAR
-
-    PARSEINT  shift, and go to state 137
-
-
-state 131
-
-   47 funcinvocation: IDENTIFIER LPAR error RPAR .
-
-    $default  reduce using rule 47 (funcinvocation)
-
-
-state 132
-
-   45 funcinvocation: . IDENTIFIER LPAR expr funcinvocation2 RPAR
-   46               | . IDENTIFIER LPAR RPAR
-   47               | . IDENTIFIER LPAR error RPAR
-   48 funcinvocation2: COMMA . expr funcinvocation2
-   50 expr: . expr OR expr
-   51     | . expr AND expr
-   52     | . expr LT expr
-   53     | . expr GT expr
-   54     | . expr EQ expr
-   55     | . expr NE expr
-   56     | . expr LE expr
-   57     | . expr GE expr
-   58     | . expr PLUS expr
-   59     | . expr MINUS expr
-   60     | . expr STAR expr
-   61     | . expr DIV expr
-   62     | . expr MOD expr
-   63     | . NOT expr
-   64     | . MINUS expr
-   65     | . PLUS expr
-   66     | . NATURAL
-   67     | . DECIMAL
-   68     | . IDENTIFIER
-   69     | . funcinvocation
-   70     | . LPAR expr RPAR
-   71     | . LPAR error RPAR
-
-    MINUS       shift, and go to state 59
-    PLUS        shift, and go to state 60
-    LPAR        shift, and go to state 61
-    NOT         shift, and go to state 62
-    IDENTIFIER  shift, and go to state 63
-    NATURAL     shift, and go to state 64
-    DECIMAL     shift, and go to state 65
-
-    funcinvocation  go to state 66
-    expr            go to state 138
-
-
-state 133
-
-   45 funcinvocation: IDENTIFIER LPAR expr funcinvocation2 . RPAR
-
-    RPAR  shift, and go to state 139
-
-
-state 134
-
-   21 parameters2: COMMA IDENTIFIER type parameters2 .
-
-    $default  reduce using rule 21 (parameters2)
-
-
-state 135
-
-   32 statement: FOR expr LBRACE statement2 RBRACE .
-
-    $default  reduce using rule 32 (statement)
-
-
-state 136
-
-   30 statement: IF expr LBRACE statement2 RBRACE . ELSE LBRACE statement2 RBRACE
-   31          | IF expr LBRACE statement2 RBRACE .  [SEMICOLON]
-
-    ELSE  shift, and go to state 140
+   31 statement: FOR LBRACE statement2 RBRACE .
 
     $default  reduce using rule 31 (statement)
 
 
-state 137
+state 129
 
-   43 parseargs: IDENTIFIER COMMA BLANKID ASSIGN PARSEINT . LPAR CMDARGS LSQ expr RSQ RPAR
-   44          | IDENTIFIER COMMA BLANKID ASSIGN PARSEINT . LPAR error RPAR
+   26 statement: . IDENTIFIER ASSIGN expr
+   27          | . LBRACE statement2 RBRACE
+   28          | . IF expr LBRACE statement2 RBRACE ELSE LBRACE statement2 RBRACE
+   29          | . IF expr LBRACE statement2 RBRACE
+   30          | . FOR expr LBRACE statement2 RBRACE
+   30          | FOR expr LBRACE statement2 . RBRACE
+   31          | . FOR LBRACE statement2 RBRACE
+   32          | . RETURN expr
+   33          | . RETURN
+   34          | . funcinvocation
+   35          | . parseargs
+   36          | . PRINT LPAR expr RPAR
+   37          | . PRINT LPAR STRLIT RPAR
+   38          | . error
+   39 statement2: statement2 . statement SEMICOLON
+   41 parseargs: . IDENTIFIER COMMA BLANKID ASSIGN PARSEINT LPAR CMDARGS LSQ expr RSQ RPAR
+   42          | . IDENTIFIER COMMA BLANKID ASSIGN PARSEINT LPAR error RPAR
+   43 funcinvocation: . IDENTIFIER LPAR expr funcinvocation2 RPAR
+   44               | . IDENTIFIER LPAR RPAR
+   45               | . IDENTIFIER LPAR error RPAR
 
-    LPAR  shift, and go to state 141
+    error       shift, and go to state 46
+    LBRACE      shift, and go to state 48
+    RBRACE      shift, and go to state 137
+    RETURN      shift, and go to state 50
+    FOR         shift, and go to state 51
+    IF          shift, and go to state 52
+    PRINT       shift, and go to state 53
+    IDENTIFIER  shift, and go to state 54
 
-
-state 138
-
-   48 funcinvocation2: . COMMA expr funcinvocation2
-   48                | COMMA expr . funcinvocation2
-   49                | .  [RPAR]
-   50 expr: expr . OR expr
-   51     | expr . AND expr
-   52     | expr . LT expr
-   53     | expr . GT expr
-   54     | expr . EQ expr
-   55     | expr . NE expr
-   56     | expr . LE expr
-   57     | expr . GE expr
-   58     | expr . PLUS expr
-   59     | expr . MINUS expr
-   60     | expr . STAR expr
-   61     | expr . DIV expr
-   62     | expr . MOD expr
-
-    COMMA  shift, and go to state 132
-    STAR   shift, and go to state 85
-    DIV    shift, and go to state 86
-    MINUS  shift, and go to state 87
-    PLUS   shift, and go to state 88
-    EQ     shift, and go to state 89
-    GE     shift, and go to state 90
-    GT     shift, and go to state 91
-    LE     shift, and go to state 92
-    LT     shift, and go to state 93
-    MOD    shift, and go to state 94
-    NE     shift, and go to state 95
-    AND    shift, and go to state 96
-    OR     shift, and go to state 97
-
-    $default  reduce using rule 49 (funcinvocation2)
-
-    funcinvocation2  go to state 142
+    statement       go to state 82
+    parseargs       go to state 57
+    funcinvocation  go to state 58
 
 
-state 139
+state 130
 
-   45 funcinvocation: IDENTIFIER LPAR expr funcinvocation2 RPAR .
+   26 statement: . IDENTIFIER ASSIGN expr
+   27          | . LBRACE statement2 RBRACE
+   28          | . IF expr LBRACE statement2 RBRACE ELSE LBRACE statement2 RBRACE
+   28          | IF expr LBRACE statement2 . RBRACE ELSE LBRACE statement2 RBRACE
+   29          | . IF expr LBRACE statement2 RBRACE
+   29          | IF expr LBRACE statement2 . RBRACE
+   30          | . FOR expr LBRACE statement2 RBRACE
+   31          | . FOR LBRACE statement2 RBRACE
+   32          | . RETURN expr
+   33          | . RETURN
+   34          | . funcinvocation
+   35          | . parseargs
+   36          | . PRINT LPAR expr RPAR
+   37          | . PRINT LPAR STRLIT RPAR
+   38          | . error
+   39 statement2: statement2 . statement SEMICOLON
+   41 parseargs: . IDENTIFIER COMMA BLANKID ASSIGN PARSEINT LPAR CMDARGS LSQ expr RSQ RPAR
+   42          | . IDENTIFIER COMMA BLANKID ASSIGN PARSEINT LPAR error RPAR
+   43 funcinvocation: . IDENTIFIER LPAR expr funcinvocation2 RPAR
+   44               | . IDENTIFIER LPAR RPAR
+   45               | . IDENTIFIER LPAR error RPAR
+
+    error       shift, and go to state 46
+    LBRACE      shift, and go to state 48
+    RBRACE      shift, and go to state 138
+    RETURN      shift, and go to state 50
+    FOR         shift, and go to state 51
+    IF          shift, and go to state 52
+    PRINT       shift, and go to state 53
+    IDENTIFIER  shift, and go to state 54
+
+    statement       go to state 82
+    parseargs       go to state 57
+    funcinvocation  go to state 58
+
+
+state 131
+
+   37 statement: PRINT LPAR STRLIT RPAR .
+
+    $default  reduce using rule 37 (statement)
+
+
+state 132
+
+   36 statement: PRINT LPAR expr RPAR .
+
+    $default  reduce using rule 36 (statement)
+
+
+state 133
+
+   41 parseargs: IDENTIFIER COMMA BLANKID ASSIGN . PARSEINT LPAR CMDARGS LSQ expr RSQ RPAR
+   42          | IDENTIFIER COMMA BLANKID ASSIGN . PARSEINT LPAR error RPAR
+
+    PARSEINT  shift, and go to state 139
+
+
+state 134
+
+   45 funcinvocation: IDENTIFIER LPAR error RPAR .
 
     $default  reduce using rule 45 (funcinvocation)
 
 
-state 140
+state 135
 
-   30 statement: IF expr LBRACE statement2 RBRACE ELSE . LBRACE statement2 RBRACE
+   43 funcinvocation: . IDENTIFIER LPAR expr funcinvocation2 RPAR
+   44               | . IDENTIFIER LPAR RPAR
+   45               | . IDENTIFIER LPAR error RPAR
+   46 funcinvocation2: COMMA . expr funcinvocation2
+   48 expr: . expr OR expr
+   49     | . expr AND expr
+   50     | . expr LT expr
+   51     | . expr GT expr
+   52     | . expr EQ expr
+   53     | . expr NE expr
+   54     | . expr LE expr
+   55     | . expr GE expr
+   56     | . expr PLUS expr
+   57     | . expr MINUS expr
+   58     | . expr STAR expr
+   59     | . expr DIV expr
+   60     | . expr MOD expr
+   61     | . NOT expr
+   62     | . MINUS expr
+   63     | . PLUS expr
+   64     | . NATURAL
+   65     | . DECIMAL
+   66     | . IDENTIFIER
+   67     | . funcinvocation
+   68     | . LPAR expr RPAR
+   69     | . LPAR error RPAR
 
-    LBRACE  shift, and go to state 143
+    MINUS       shift, and go to state 62
+    PLUS        shift, and go to state 63
+    LPAR        shift, and go to state 64
+    NOT         shift, and go to state 65
+    IDENTIFIER  shift, and go to state 66
+    NATURAL     shift, and go to state 67
+    DECIMAL     shift, and go to state 68
 
-
-state 141
-
-   43 parseargs: IDENTIFIER COMMA BLANKID ASSIGN PARSEINT LPAR . CMDARGS LSQ expr RSQ RPAR
-   44          | IDENTIFIER COMMA BLANKID ASSIGN PARSEINT LPAR . error RPAR
-
-    error    shift, and go to state 144
-    CMDARGS  shift, and go to state 145
-
-
-state 142
-
-   48 funcinvocation2: COMMA expr funcinvocation2 .
-
-    $default  reduce using rule 48 (funcinvocation2)
-
-
-state 143
-
-   30 statement: IF expr LBRACE statement2 RBRACE ELSE LBRACE . statement2 RBRACE
-   41 statement2: . statement2 statement SEMICOLON
-   42           | .
-
-    $default  reduce using rule 42 (statement2)
-
-    statement2  go to state 146
-
-
-state 144
-
-   44 parseargs: IDENTIFIER COMMA BLANKID ASSIGN PARSEINT LPAR error . RPAR
-
-    RPAR  shift, and go to state 147
-
-
-state 145
-
-   43 parseargs: IDENTIFIER COMMA BLANKID ASSIGN PARSEINT LPAR CMDARGS . LSQ expr RSQ RPAR
-
-    LSQ  shift, and go to state 148
+    funcinvocation  go to state 69
+    expr            go to state 140
 
 
-state 146
+state 136
 
-   28 statement: . IDENTIFIER ASSIGN expr
-   29          | . LBRACE statement2 RBRACE
-   30          | . IF expr LBRACE statement2 RBRACE ELSE LBRACE statement2 RBRACE
-   30          | IF expr LBRACE statement2 RBRACE ELSE LBRACE statement2 . RBRACE
-   31          | . IF expr LBRACE statement2 RBRACE
-   32          | . FOR expr LBRACE statement2 RBRACE
-   33          | . FOR LBRACE statement2 RBRACE
-   34          | . RETURN expr
-   35          | . RETURN
-   36          | . funcinvocation
-   37          | . parseargs
-   38          | . PRINT LPAR expr RPAR
-   39          | . PRINT LPAR STRLIT RPAR
-   40          | . error
-   41 statement2: statement2 . statement SEMICOLON
-   43 parseargs: . IDENTIFIER COMMA BLANKID ASSIGN PARSEINT LPAR CMDARGS LSQ expr RSQ RPAR
-   44          | . IDENTIFIER COMMA BLANKID ASSIGN PARSEINT LPAR error RPAR
-   45 funcinvocation: . IDENTIFIER LPAR expr funcinvocation2 RPAR
-   46               | . IDENTIFIER LPAR RPAR
-   47               | . IDENTIFIER LPAR error RPAR
+   43 funcinvocation: IDENTIFIER LPAR expr funcinvocation2 . RPAR
 
-    error       shift, and go to state 41
-    LBRACE      shift, and go to state 43
-    RBRACE      shift, and go to state 149
-    RETURN      shift, and go to state 45
-    FOR         shift, and go to state 46
-    IF          shift, and go to state 47
-    PRINT       shift, and go to state 48
-    IDENTIFIER  shift, and go to state 49
-
-    statement       go to state 79
-    parseargs       go to state 52
-    funcinvocation  go to state 53
+    RPAR  shift, and go to state 141
 
 
-state 147
+state 137
 
-   44 parseargs: IDENTIFIER COMMA BLANKID ASSIGN PARSEINT LPAR error RPAR .
-
-    $default  reduce using rule 44 (parseargs)
-
-
-state 148
-
-   43 parseargs: IDENTIFIER COMMA BLANKID ASSIGN PARSEINT LPAR CMDARGS LSQ . expr RSQ RPAR
-   45 funcinvocation: . IDENTIFIER LPAR expr funcinvocation2 RPAR
-   46               | . IDENTIFIER LPAR RPAR
-   47               | . IDENTIFIER LPAR error RPAR
-   50 expr: . expr OR expr
-   51     | . expr AND expr
-   52     | . expr LT expr
-   53     | . expr GT expr
-   54     | . expr EQ expr
-   55     | . expr NE expr
-   56     | . expr LE expr
-   57     | . expr GE expr
-   58     | . expr PLUS expr
-   59     | . expr MINUS expr
-   60     | . expr STAR expr
-   61     | . expr DIV expr
-   62     | . expr MOD expr
-   63     | . NOT expr
-   64     | . MINUS expr
-   65     | . PLUS expr
-   66     | . NATURAL
-   67     | . DECIMAL
-   68     | . IDENTIFIER
-   69     | . funcinvocation
-   70     | . LPAR expr RPAR
-   71     | . LPAR error RPAR
-
-    MINUS       shift, and go to state 59
-    PLUS        shift, and go to state 60
-    LPAR        shift, and go to state 61
-    NOT         shift, and go to state 62
-    IDENTIFIER  shift, and go to state 63
-    NATURAL     shift, and go to state 64
-    DECIMAL     shift, and go to state 65
-
-    funcinvocation  go to state 66
-    expr            go to state 150
-
-
-state 149
-
-   30 statement: IF expr LBRACE statement2 RBRACE ELSE LBRACE statement2 RBRACE .
+   30 statement: FOR expr LBRACE statement2 RBRACE .
 
     $default  reduce using rule 30 (statement)
 
 
+state 138
+
+   28 statement: IF expr LBRACE statement2 RBRACE . ELSE LBRACE statement2 RBRACE
+   29          | IF expr LBRACE statement2 RBRACE .  [SEMICOLON]
+
+    ELSE  shift, and go to state 142
+
+    $default  reduce using rule 29 (statement)
+
+
+state 139
+
+   41 parseargs: IDENTIFIER COMMA BLANKID ASSIGN PARSEINT . LPAR CMDARGS LSQ expr RSQ RPAR
+   42          | IDENTIFIER COMMA BLANKID ASSIGN PARSEINT . LPAR error RPAR
+
+    LPAR  shift, and go to state 143
+
+
+state 140
+
+   46 funcinvocation2: . COMMA expr funcinvocation2
+   46                | COMMA expr . funcinvocation2
+   47                | .  [RPAR]
+   48 expr: expr . OR expr
+   49     | expr . AND expr
+   50     | expr . LT expr
+   51     | expr . GT expr
+   52     | expr . EQ expr
+   53     | expr . NE expr
+   54     | expr . LE expr
+   55     | expr . GE expr
+   56     | expr . PLUS expr
+   57     | expr . MINUS expr
+   58     | expr . STAR expr
+   59     | expr . DIV expr
+   60     | expr . MOD expr
+
+    COMMA  shift, and go to state 135
+    STAR   shift, and go to state 88
+    DIV    shift, and go to state 89
+    MINUS  shift, and go to state 90
+    PLUS   shift, and go to state 91
+    EQ     shift, and go to state 92
+    GE     shift, and go to state 93
+    GT     shift, and go to state 94
+    LE     shift, and go to state 95
+    LT     shift, and go to state 96
+    MOD    shift, and go to state 97
+    NE     shift, and go to state 98
+    AND    shift, and go to state 99
+    OR     shift, and go to state 100
+
+    $default  reduce using rule 47 (funcinvocation2)
+
+    funcinvocation2  go to state 144
+
+
+state 141
+
+   43 funcinvocation: IDENTIFIER LPAR expr funcinvocation2 RPAR .
+
+    $default  reduce using rule 43 (funcinvocation)
+
+
+state 142
+
+   28 statement: IF expr LBRACE statement2 RBRACE ELSE . LBRACE statement2 RBRACE
+
+    LBRACE  shift, and go to state 145
+
+
+state 143
+
+   41 parseargs: IDENTIFIER COMMA BLANKID ASSIGN PARSEINT LPAR . CMDARGS LSQ expr RSQ RPAR
+   42          | IDENTIFIER COMMA BLANKID ASSIGN PARSEINT LPAR . error RPAR
+
+    error    shift, and go to state 146
+    CMDARGS  shift, and go to state 147
+
+
+state 144
+
+   46 funcinvocation2: COMMA expr funcinvocation2 .
+
+    $default  reduce using rule 46 (funcinvocation2)
+
+
+state 145
+
+   28 statement: IF expr LBRACE statement2 RBRACE ELSE LBRACE . statement2 RBRACE
+   39 statement2: . statement2 statement SEMICOLON
+   40           | .
+
+    $default  reduce using rule 40 (statement2)
+
+    statement2  go to state 148
+
+
+state 146
+
+   42 parseargs: IDENTIFIER COMMA BLANKID ASSIGN PARSEINT LPAR error . RPAR
+
+    RPAR  shift, and go to state 149
+
+
+state 147
+
+   41 parseargs: IDENTIFIER COMMA BLANKID ASSIGN PARSEINT LPAR CMDARGS . LSQ expr RSQ RPAR
+
+    LSQ  shift, and go to state 150
+
+
+state 148
+
+   26 statement: . IDENTIFIER ASSIGN expr
+   27          | . LBRACE statement2 RBRACE
+   28          | . IF expr LBRACE statement2 RBRACE ELSE LBRACE statement2 RBRACE
+   28          | IF expr LBRACE statement2 RBRACE ELSE LBRACE statement2 . RBRACE
+   29          | . IF expr LBRACE statement2 RBRACE
+   30          | . FOR expr LBRACE statement2 RBRACE
+   31          | . FOR LBRACE statement2 RBRACE
+   32          | . RETURN expr
+   33          | . RETURN
+   34          | . funcinvocation
+   35          | . parseargs
+   36          | . PRINT LPAR expr RPAR
+   37          | . PRINT LPAR STRLIT RPAR
+   38          | . error
+   39 statement2: statement2 . statement SEMICOLON
+   41 parseargs: . IDENTIFIER COMMA BLANKID ASSIGN PARSEINT LPAR CMDARGS LSQ expr RSQ RPAR
+   42          | . IDENTIFIER COMMA BLANKID ASSIGN PARSEINT LPAR error RPAR
+   43 funcinvocation: . IDENTIFIER LPAR expr funcinvocation2 RPAR
+   44               | . IDENTIFIER LPAR RPAR
+   45               | . IDENTIFIER LPAR error RPAR
+
+    error       shift, and go to state 46
+    LBRACE      shift, and go to state 48
+    RBRACE      shift, and go to state 151
+    RETURN      shift, and go to state 50
+    FOR         shift, and go to state 51
+    IF          shift, and go to state 52
+    PRINT       shift, and go to state 53
+    IDENTIFIER  shift, and go to state 54
+
+    statement       go to state 82
+    parseargs       go to state 57
+    funcinvocation  go to state 58
+
+
+state 149
+
+   42 parseargs: IDENTIFIER COMMA BLANKID ASSIGN PARSEINT LPAR error RPAR .
+
+    $default  reduce using rule 42 (parseargs)
+
+
 state 150
 
-   43 parseargs: IDENTIFIER COMMA BLANKID ASSIGN PARSEINT LPAR CMDARGS LSQ expr . RSQ RPAR
-   50 expr: expr . OR expr
-   51     | expr . AND expr
-   52     | expr . LT expr
-   53     | expr . GT expr
-   54     | expr . EQ expr
-   55     | expr . NE expr
-   56     | expr . LE expr
-   57     | expr . GE expr
-   58     | expr . PLUS expr
-   59     | expr . MINUS expr
-   60     | expr . STAR expr
-   61     | expr . DIV expr
-   62     | expr . MOD expr
+   41 parseargs: IDENTIFIER COMMA BLANKID ASSIGN PARSEINT LPAR CMDARGS LSQ . expr RSQ RPAR
+   43 funcinvocation: . IDENTIFIER LPAR expr funcinvocation2 RPAR
+   44               | . IDENTIFIER LPAR RPAR
+   45               | . IDENTIFIER LPAR error RPAR
+   48 expr: . expr OR expr
+   49     | . expr AND expr
+   50     | . expr LT expr
+   51     | . expr GT expr
+   52     | . expr EQ expr
+   53     | . expr NE expr
+   54     | . expr LE expr
+   55     | . expr GE expr
+   56     | . expr PLUS expr
+   57     | . expr MINUS expr
+   58     | . expr STAR expr
+   59     | . expr DIV expr
+   60     | . expr MOD expr
+   61     | . NOT expr
+   62     | . MINUS expr
+   63     | . PLUS expr
+   64     | . NATURAL
+   65     | . DECIMAL
+   66     | . IDENTIFIER
+   67     | . funcinvocation
+   68     | . LPAR expr RPAR
+   69     | . LPAR error RPAR
 
-    STAR   shift, and go to state 85
-    DIV    shift, and go to state 86
-    MINUS  shift, and go to state 87
-    PLUS   shift, and go to state 88
-    EQ     shift, and go to state 89
-    GE     shift, and go to state 90
-    GT     shift, and go to state 91
-    LE     shift, and go to state 92
-    LT     shift, and go to state 93
-    MOD    shift, and go to state 94
-    NE     shift, and go to state 95
-    AND    shift, and go to state 96
-    OR     shift, and go to state 97
-    RSQ    shift, and go to state 151
+    MINUS       shift, and go to state 62
+    PLUS        shift, and go to state 63
+    LPAR        shift, and go to state 64
+    NOT         shift, and go to state 65
+    IDENTIFIER  shift, and go to state 66
+    NATURAL     shift, and go to state 67
+    DECIMAL     shift, and go to state 68
+
+    funcinvocation  go to state 69
+    expr            go to state 152
 
 
 state 151
 
-   43 parseargs: IDENTIFIER COMMA BLANKID ASSIGN PARSEINT LPAR CMDARGS LSQ expr RSQ . RPAR
+   28 statement: IF expr LBRACE statement2 RBRACE ELSE LBRACE statement2 RBRACE .
 
-    RPAR  shift, and go to state 152
+    $default  reduce using rule 28 (statement)
 
 
 state 152
 
-   43 parseargs: IDENTIFIER COMMA BLANKID ASSIGN PARSEINT LPAR CMDARGS LSQ expr RSQ RPAR .
+   41 parseargs: IDENTIFIER COMMA BLANKID ASSIGN PARSEINT LPAR CMDARGS LSQ expr . RSQ RPAR
+   48 expr: expr . OR expr
+   49     | expr . AND expr
+   50     | expr . LT expr
+   51     | expr . GT expr
+   52     | expr . EQ expr
+   53     | expr . NE expr
+   54     | expr . LE expr
+   55     | expr . GE expr
+   56     | expr . PLUS expr
+   57     | expr . MINUS expr
+   58     | expr . STAR expr
+   59     | expr . DIV expr
+   60     | expr . MOD expr
 
-    $default  reduce using rule 43 (parseargs)
+    STAR   shift, and go to state 88
+    DIV    shift, and go to state 89
+    MINUS  shift, and go to state 90
+    PLUS   shift, and go to state 91
+    EQ     shift, and go to state 92
+    GE     shift, and go to state 93
+    GT     shift, and go to state 94
+    LE     shift, and go to state 95
+    LT     shift, and go to state 96
+    MOD    shift, and go to state 97
+    NE     shift, and go to state 98
+    AND    shift, and go to state 99
+    OR     shift, and go to state 100
+    RSQ    shift, and go to state 153
+
+
+state 153
+
+   41 parseargs: IDENTIFIER COMMA BLANKID ASSIGN PARSEINT LPAR CMDARGS LSQ expr RSQ . RPAR
+
+    RPAR  shift, and go to state 154
+
+
+state 154
+
+   41 parseargs: IDENTIFIER COMMA BLANKID ASSIGN PARSEINT LPAR CMDARGS LSQ expr RSQ RPAR .
+
+    $default  reduce using rule 41 (parseargs)

@@ -1,4 +1,6 @@
 %{
+    /* Andre Miguel Martinho de Melo 2022213285 */
+
     #include <stdio.h>
     #include <stdlib.h>
     #include <string.h>
@@ -38,7 +40,7 @@
     }
 
 %}
-%X COMMENT_BARRAS STRLIT COMMENT_ASTERISCO
+%X COMMENT_BARRAS STRLIT2 COMMENT_ASTERISCO
 
 
 newline                 \n|\r|\r\n
@@ -111,7 +113,7 @@ reserved                "++"|"--"|"break"|"case"|"chan"|"const"|"continue"|"defa
 %%
 
 "//"                                    {BEGIN(COMMENT_BARRAS);}
-<COMMENT_BARRAS>{newline}               {BEGIN(INITIAL);coluna=1,linha++;if(last_token==1)printf("SEMICOLON\n");last_token=0;}
+<COMMENT_BARRAS>{newline}               {BEGIN(INITIAL);coluna=1;linha++;if(last_token==1)printf("SEMICOLON\n");last_token=0;}
 <COMMENT_BARRAS>.                       {}
 
 
@@ -122,13 +124,13 @@ reserved                "++"|"--"|"break"|"case"|"chan"|"const"|"continue"|"defa
 <COMMENT_ASTERISCO><<EOF>>              {printf("Line %d, column %d: unterminated comment\n",linha_coluna[0],linha_coluna[1]);last_token=0;return 1;}
 
 
-\"                                      {BEGIN(STRLIT); flag_string=1;reset_str_buffer();add_str_buffer(yytext, yyleng); linha_coluna[0]=linha; linha_coluna[1]=coluna-yyleng;}
-<STRLIT>\"                              {add_str_buffer(yytext, yyleng);str_buffer[str_buffer_index] = '\0';if(flag==1&&flag_string==1){printf("STRLIT(%s)\n",str_buffer);last_token=1;};reset_str_buffer();BEGIN(INITIAL);}
-<STRLIT>{escape_seq}                    {add_str_buffer(yytext, yyleng);}
-<STRLIT>((\\.)|(\\))                    {printf("Line %d, column %zu: invalid escape sequence (%s)\n",linha,coluna-yyleng,yytext);flag_string=0;str_buffer_index+=yyleng;}
-<STRLIT>{newline}                       {linha++; coluna= 1; printf("Line %d, column %d: unterminated string literal\n",linha_coluna[0],linha_coluna[1]);reset_str_buffer();BEGIN(INITIAL);}
-<STRLIT>.                               {add_str_buffer(yytext, yyleng);}
-<STRLIT><<EOF>>                         {printf("Line %d, column %d: unterminated string literal\n",linha_coluna[0],linha_coluna[1]);reset_str_buffer(); BEGIN(INITIAL);return 1;}
+\"                                      {BEGIN(STRLIT2); flag_string=1;reset_str_buffer();add_str_buffer(yytext, yyleng); linha_coluna[0]=linha; linha_coluna[1]=coluna-yyleng;}
+<STRLIT2>\"                              {add_str_buffer(yytext, yyleng);BEGIN(INITIAL);if(flag_string==1){if(flag==1){printf("STRLIT(%s)\n",str_buffer);}last_token=1;yylval.lexeme = strdup(str_buffer);return STRLIT;}}
+<STRLIT2>{escape_seq}                    {add_str_buffer(yytext, yyleng);}
+<STRLIT2>((\\.)|(\\))                    {printf("Line %d, column %zu: invalid escape sequence (%s)\n",linha,coluna-yyleng,yytext);flag_string=0;str_buffer_index+=yyleng;}
+<STRLIT2>{newline}                       {linha++; coluna= 1; printf("Line %d, column %d: unterminated string literal\n",linha_coluna[0],linha_coluna[1]);reset_str_buffer();BEGIN(INITIAL);}
+<STRLIT2>.                               {add_str_buffer(yytext, yyleng);}
+<STRLIT2><<EOF>>                         {printf("Line %d, column %d: unterminated string literal\n",linha_coluna[0],linha_coluna[1]);reset_str_buffer(); BEGIN(INITIAL);return 0;}
 
 
 
@@ -163,7 +165,7 @@ reserved                "++"|"--"|"break"|"case"|"chan"|"const"|"continue"|"defa
 {for}                                   {if(flag == 1)printf("FOR\n");last_token=0;return FOR;}
 {if}                                    {if(flag == 1)printf("IF\n");last_token=0;return IF;}
 {var}                                   {if(flag == 1)printf("VAR\n");last_token=0;return VAR;}
-{int}                                   {if(flag == 1)printf("INT\n");last_token=0;}return INT;
+{int}                                   {if(flag == 1)printf("INT\n");last_token=0;return INT;}
 {float32}                               {if(flag == 1)printf("FLOAT32\n");last_token=0;return FLOAT32;}
 {bool}                                  {if(flag == 1)printf("BOOL\n");last_token=0;return BOOL;}
 {string}                                {if(flag == 1)printf("STRING\n");last_token=0;return STRING;}
@@ -171,7 +173,7 @@ reserved                "++"|"--"|"break"|"case"|"chan"|"const"|"continue"|"defa
 {parseint}                              {if(flag == 1)printf("PARSEINT\n");last_token=0;return PARSEINT;}
 {func}                                  {if(flag == 1)printf("FUNC\n");last_token=0;return FUNC;}
 {cmdargs}                               {if(flag == 1)printf("CMDARGS\n");last_token=0;return CMDARGS;}
-{ignore}                                {;}
+{ignore}                                {}
 
 {reserved}                              {if(flag == 1)printf("RESERVED(%s)\n",yytext);last_token=0;return RESERVED;}
 
@@ -184,13 +186,30 @@ reserved                "++"|"--"|"break"|"case"|"chan"|"const"|"continue"|"defa
 {hex}                                   {if(flag == 1)printf("NATURAL(%s)\n",yytext);last_token=1;PASS_TOKEN();return NATURAL;}
 {decimal}                               {if(flag == 1)printf("DECIMAL(%s)\n",yytext);last_token=1;PASS_TOKEN();return DECIMAL;}
 
-{newline}                               {linha++;coluna = 1;if(flag==1 && last_token==1)printf("SEMICOLON\n");last_token=0;}
+{newline}                               {linha++;coluna = 1;
+                                            if(last_token==1){
+                                                if(flag==1){
+                                                    printf("SEMICOLON\n"); 
+                                                }
+                                                last_token=0;
+                                                return SEMICOLON;
+                                            }
+                                        }
 
 
 
 .                                       { yyerror("unrecognized character"); }
 
-<<EOF>>                                 {if(flag==1 && last_token==1)printf("SEMICOLON\n");return 1;}
+<<EOF>>                                 {
+                                            if(flag==1 && last_token==1){
+                                                printf("SEMICOLON\n");
+                                                return 0;
+                                            }
+                                            if (last_token==1){
+                                                last_token=0;
+                                                return SEMICOLON;
+                                            }
+                                        last_token=0; return 0;}
 
 %%
 
@@ -200,11 +219,13 @@ extern int yylex();
 int main(int argc, char *argv[]){
     if (argc > 1 && strcmp(argv[1],"-l") == 0) {
             flag = 1;
-            yylex();
+            while(yylex()); //sem o while so imprime o primeiro e acaba o progrma
+            return 0;
     }
     else if(argc >= 2 && strcmp(argv[1], "-t") == 0 && errors == 0) {  
         yyparse();
         show(program, 0);
+        return 0;
     }else{
         yylex();
         yyparse();

@@ -1,6 +1,6 @@
-//boas
 package main;
 
-func main(){
-	ola=1
+func main(a int){
+	ola=10
+	ola=10
 }

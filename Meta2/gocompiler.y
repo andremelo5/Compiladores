@@ -15,7 +15,7 @@ struct node *program;
 
 
 %token<lexeme> IDENTIFIER NATURAL DECIMAL STRLIT
-%type<node> program  declarations vardeclaration  varspec varspec2 type funcdeclaration funcheader funcparams funcheader2 parameters parameters2 funcbody  varsandstatements  statement statement2  parseargs funcinvocation funcinvocation2 expr
+%type<node> program  declarations vardeclaration  varspec varspec2 type funcdeclaration parameters parameters2 funcbody  varsandstatements  statement statement2  parseargs funcinvocation funcinvocation2 expr
 
 
 %left COMMA
@@ -75,25 +75,40 @@ type: INT                                                       {$$=newnode(Int,
     | STRING                                                    {$$=newnode(String,NULL);}
     ;
 
-funcdeclaration: FUNC funcheader funcbody                                       {$$=newnode(FuncDecl,NULL);
-                                                                                    addchild($$,$2);
-                                                                                    addchild($$,$3);}
+funcdeclaration: FUNC IDENTIFIER LPAR parameters RPAR type funcbody                                         {$$=newnode(FuncDecl,NULL);
+                                                                                                                struct node *funcHeader = newnode (FuncHeader,NULL);
+                                                                                                                    addchild(funcHeader,newnode(Identifier, $2));
+                                                                                                                    addchild(funcHeader,$6);
+                                                                                                                struct node *funcParams = newnode(FuncParams, NULL);
+                                                                                                                    if ($4!=NULL){addchild(funcParams,$4);}
+                                                                                                                addchild(funcHeader,funcParams);
+                                                                                                                addchild($$,funcHeader);
+                                                                                                                addchild($$,$7);
+                                                                                                            }
+    | FUNC IDENTIFIER LPAR RPAR type funcbody                                                               {$$=newnode(FuncDecl,NULL);
+                                                                                                                struct node *funcHeader = newnode (FuncHeader,NULL);
+                                                                                                                    addchild(funcHeader,newnode(Identifier, $2));
+                                                                                                                    addchild(funcHeader,$5);
+                                                                                                                addchild($$,funcHeader);
+                                                                                                                addchild($$,$6);
+                                                                                                            }
+    | FUNC IDENTIFIER LPAR parameters RPAR  funcbody                                                        {$$=newnode(FuncDecl,NULL);
+                                                                                                                struct node *funcHeader = newnode (FuncHeader,NULL);
+                                                                                                                    addchild(funcHeader,newnode(Identifier, $2));
+                                                                                                                struct node *funcParams = newnode(FuncParams, NULL);
+                                                                                                                    if ($4!=NULL){addchild(funcParams,$4);}
+                                                                                                                addchild(funcHeader,funcParams);
+                                                                                                                addchild($$,funcHeader);
+                                                                                                                addchild($$,$6);
+                                                                                                            }
+    | FUNC IDENTIFIER LPAR  RPAR  funcbody                                                                  {$$=newnode(FuncDecl,NULL);
+                                                                                                                struct node *funcHeader = newnode (FuncHeader,NULL);
+                                                                                                                    addchild(funcHeader,newnode(Identifier, $2));
+                                                                                                                addchild($$,funcHeader);
+                                                                                                                addchild($$,$5);
+                                                                                                            }
     ;
 
-funcheader: IDENTIFIER LPAR funcparams RPAR funcheader2                        {$$=newnode(FuncHeader,NULL);
-                                                                                    addchild($$,newnode(Identifier,$1));
-                                                                                    addchild($$,newnode(FuncParams,NULL));
-                                                                                    if($3!=NULL){addchild($$,$3);}
-                                                                                    if($5!=NULL){addchild($$,$5);}}
-    ;
-
-funcparams: parameters                                                          {$$=$1;}
-    |/*vazio*/                                                                  {$$=NULL;}
-    ;
-
-funcheader2: type                                                               {$$=$1;}
-    |/*vazio*/                                                                  {$$=NULL;}
-    ;
 
 parameters: IDENTIFIER type parameters2                                         {$$=newnode(ParamDecl,NULL);
                                                                                     addchild($$,$2);
@@ -114,10 +129,22 @@ funcbody: LBRACE varsandstatements RBRACE                                       
     ;
 
 varsandstatements: varsandstatements SEMICOLON                                  {$$=$1;}
-    | varsandstatements vardeclaration SEMICOLON                                {$$=$1;
-                                                                                    addchild($$,$2);}
-    | varsandstatements statement SEMICOLON                                     {$$=$1;
-                                                                                    addchild($$,$2);}                                
+    | varsandstatements vardeclaration SEMICOLON                                {
+                                                                                    if($1!=NULL){
+                                                                                        addchild($1,$2);
+                                                                                        $$=$1;
+                                                                                    }else{
+                                                                                        $$=$2;
+                                                                                    }
+                                                                                }
+    | varsandstatements statement SEMICOLON                                     {
+                                                                                    if($1!=NULL){
+                                                                                        addchild($1,$2);
+                                                                                        $$=$1;
+                                                                                    }else{
+                                                                                        $$=$2;
+                                                                                    }
+                                                                                }                               
     | /* vazio*/                                                                {$$=NULL;}
     ;
 
