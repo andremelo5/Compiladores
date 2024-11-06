@@ -1,6 +1,5 @@
-package main;
+package main; 
 
-func main(a int){
-	ola=10
-	ola=10
-}
+var i2 int;
+
+var i2 int;

@@ -2298,7 +2298,7 @@ int main(int argc, char *argv[]){
         show(program, 0);
         return 0;
     }else{
-        yylex();
+        while(yylex());
         yyparse();
         return 0;
     }

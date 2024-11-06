@@ -42,7 +42,7 @@ struct node *program;
 %%
 
 program: PACKAGE IDENTIFIER SEMICOLON declarations              {$$=program=newnode(Program,NULL);
-                                                                    addchild($$,$4);}
+                                                                    if($4!=NULL){addchild($$,$4);}}
     ;
 
 
