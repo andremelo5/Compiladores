@@ -2,5 +2,5 @@
 package main;
 
 func main(){
-	ola=10
+	ola=1
 }
