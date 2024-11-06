@@ -1,5 +1,6 @@
+//boas
 package main;
 
 func main(){
-	fmt.Println("boas")
+	ola=10
 }
