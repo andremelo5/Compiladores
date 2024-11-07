@@ -26,6 +26,22 @@ void addchild(struct node *parent, struct node *child) {
 }
 
 
+// get a pointer to a specific child, numbered 0, 1, 2, ...
+struct node *getchild(struct node *parent, int position) {
+    struct node_list *children = parent->children;
+    while((children = children->next) != NULL)
+        if(position-- == 0)
+            return children->node;
+    return NULL;
+}
+
+// count the children of a node
+int countchildren(struct node *node) {
+    int i = 0;
+    while(getchild(node, i) != NULL)
+        i++;
+    return i;
+}
 
 char *category_name[] = names;//ver .h
 //funcao para mostrar a AST

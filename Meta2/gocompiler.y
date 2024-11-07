@@ -10,6 +10,7 @@ void yyerror(char *);
 
 struct node *program;
 
+
 %}
 
 %token SEMICOLON COMMA BLANKID ASSIGN STAR DIV MINUS PLUS EQ GE GT LBRACE LE LPAR LSQ LT MOD NE NOT AND OR RBRACE RPAR RSQ PACKAGE RETURN ELSE FOR IF VAR INT FLOAT32 BOOL STRING PRINT PARSEINT FUNC CMDARGS RESERVED 
@@ -42,7 +43,7 @@ struct node *program;
 %%
 
 program: PACKAGE IDENTIFIER SEMICOLON declarations              {$$=program=newnode(Program,NULL);
-                                                                    addchild($$,$4);}
+                                                                    if($4!=NULL){addchild($$,$4);}}
     ;
 
 
@@ -152,21 +153,42 @@ varsandstatements: varsandstatements SEMICOLON                                  
 statement: IDENTIFIER ASSIGN expr                                               {$$=newnode(Assign,NULL);
                                                                                     addchild($$,newnode(Identifier,$1));
                                                                                     addchild($$,$3);}
-    | LBRACE statement2 RBRACE                                                  {$$=newnode(Block,NULL);
-                                                                                    if($2!=NULL){addchild($$,$2);}}
-    | IF expr LBRACE statement2 RBRACE ELSE LBRACE statement2 RBRACE            {$$=newnode(If,NULL);
+    | LBRACE statement2 RBRACE                                                  {
+                                                                                    if($2!=NULL){
+                                                                                        if (countchildren($2) > 1){
+                                                                                            $$=newnode(Block,NULL);
+                                                                                            addchild($$,$2);
+                                                                                        }else{
+                                                                                            $$=$2;
+                                                                                        }
+                                                                                    }else{
+                                                                                        $$=NULL;
+                                                                                    }
+                                                                                }
+    | IF expr LBRACE statement2 RBRACE ELSE LBRACE statement2 RBRACE            {
+                                                                                    $$=newnode(If,NULL);
                                                                                     addchild($$,$2);
-                                                                                    if($4!=NULL){addchild($$,$4);}
-                                                                                    if($8!=NULL){addchild($$,$8);}}
-    | IF expr LBRACE statement2 RBRACE                                          {$$=newnode(If,NULL);
+                                                                                    addchild($$, newnode(Block, NULL));
+                                                                                    if($4!=NULL){addchild($$->children->next->node,$4);} //$$->children->next->node --> filho de block
+                                                                                    addchild($$, newnode(Block, NULL));
+                                                                                    if($8!=NULL){addchild($$->children->next->next->node,$8);}//$$->children->next->next->node --> filho do segundo block
+                                                                                }
+    | IF expr LBRACE statement2 RBRACE                                          {
+                                                                                    $$=newnode(If,NULL);
                                                                                     addchild($$,$2);
-                                                                                    if($4!=NULL){addchild($$,$4);}}                                                                                
+                                                                                    addchild($$,newnode(Block,NULL));
+                                                                                    if($4!=NULL){addchild($$->children->next->node,$4);}
+                                                                                }                                                                                
     | FOR expr LBRACE statement2 RBRACE                                         {$$=newnode(For,NULL);
                                                                                     addchild($$,$2);
-                                                                                    if($4!=NULL){addchild($$,$4);}}
+                                                                                    addchild($$,newnode(Block,NULL));
+                                                                                    if($4!=NULL){addchild($$->children->next->node,$4);}
+                                                                                }
 
     | FOR  LBRACE statement2 RBRACE                                             {$$=newnode(For,NULL);
-                                                                                    if($3!=NULL){addchild($$,$3);}}
+                                                                                    addchild($$,newnode(Block,NULL));
+                                                                                    if($3!=NULL){addchild($$->children->node,$3);}
+                                                                                }
     | RETURN expr                                                               {$$=newnode(Return,NULL);
                                                                                     addchild($$,$2);}
 
@@ -175,9 +197,11 @@ statement: IDENTIFIER ASSIGN expr                                               
     | funcinvocation                                                            {$$=$1;}
     | parseargs                                                                 {$$=$1;}
     | PRINT LPAR expr RPAR                                                      {$$=newnode(Print,NULL);
-                                                                                    addchild($$,$3);}
+                                                                                    addchild($$,$3);
+                                                                                }
     | PRINT LPAR STRLIT RPAR                                                    {$$=newnode(Print,NULL);
-                                                                                    addchild($$,newnode(StrLit,$3));}
+                                                                                    addchild($$,newnode(StrLit,$3));
+                                                                                }
     | error                                                                     {$$=NULL;}
 
 statement2: statement2 statement SEMICOLON                                      {if ($1 == NULL) {

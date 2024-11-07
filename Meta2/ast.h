@@ -21,5 +21,7 @@ struct node_list {
 struct node *newnode(enum category category, char *token);
 void addchild(struct node *parent, struct node *child);
 void show(struct node *root, int depth);
+struct node *getchild(struct node *parent, int position);
+int countchildren(struct node *node);
 
 #endif
