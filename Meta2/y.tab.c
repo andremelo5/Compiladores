@@ -538,7 +538,7 @@ static const yytype_int8 yyrhs[] =
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const yytype_uint16 yyrline[] =
 {
-       0,    44,    44,    49,    51,    53,    57,    58,    61,    67,
+       0,    44,    44,    49,    52,    54,    58,    59,    62,    67,
       70,    73,    74,    75,    76,    79,    89,    96,   105,   114,
      120,   124,   127,   132,   133,   141,   149,   153,   156,   168,
      176,   182,   188,   192,   195,   197,   198,   199,   202,   205,
@@ -1593,50 +1593,50 @@ yyreduce:
     {
         case 2:
 #line 44 "gocompiler.y"
-    {program=newnode(Program,NULL);
-                                                                    if((yyvsp[(4) - (4)].node)!=NULL){addchild(program,(yyvsp[(4) - (4)].node));}}
+    {(yyval.node)=program=newnode(Program,NULL);
+                                                                    if((yyvsp[(4) - (4)].node)!=NULL){addchild((yyval.node),(yyvsp[(4) - (4)].node));}}
     break;
 
   case 3:
 #line 49 "gocompiler.y"
-    {(yyval.node) = (yyvsp[(1) - (3)].node);
+    {(yyval.node)=newnode(VarDecl,NULL);
+                                                                    addchild((yyval.node),(yyvsp[(1) - (3)].node));
                                                                     if((yyvsp[(3) - (3)].node)!=NULL){addchild((yyval.node),(yyvsp[(3) - (3)].node));}}
     break;
 
   case 4:
-#line 51 "gocompiler.y"
+#line 52 "gocompiler.y"
     {(yyval.node) = (yyvsp[(1) - (3)].node);
                                                                     if((yyvsp[(3) - (3)].node)!=NULL){addchild((yyval.node),(yyvsp[(3) - (3)].node));}}
     break;
 
   case 5:
-#line 53 "gocompiler.y"
+#line 54 "gocompiler.y"
     {(yyval.node)=NULL;}
     break;
 
   case 6:
-#line 57 "gocompiler.y"
+#line 58 "gocompiler.y"
     {(yyval.node)=(yyvsp[(2) - (2)].node);}
     break;
 
   case 7:
-#line 58 "gocompiler.y"
+#line 59 "gocompiler.y"
     {(yyval.node)=(yyvsp[(3) - (5)].node);}
     break;
 
   case 8:
-#line 61 "gocompiler.y"
-    {(yyval.node)=newnode(VarDecl,NULL);
-                                                                    addchild((yyval.node),(yyvsp[(3) - (3)].node));
-                                                                    addchild((yyval.node),newnode(Identifier,(yyvsp[(1) - (3)].lexeme)));
-                                                                    if((yyvsp[(2) - (3)].node)!=NULL){addchild((yyval.node),(yyvsp[(2) - (3)].node));}}
+#line 62 "gocompiler.y"
+    {(yyval.node)=(yyvsp[(3) - (3)].node);
+                                                                 (yyval.node)=newnode(Identifier,(yyvsp[(1) - (3)].lexeme));
+                                                                    if((yyvsp[(2) - (3)].node)!=NULL){(yyval.node)=(yyvsp[(2) - (3)].node);}}
     break;
 
   case 9:
 #line 67 "gocompiler.y"
-    {(yyval.node)=newnode(VarDecl,NULL);
-                                                                    addchild((yyval.node),newnode(Identifier,(yyvsp[(2) - (3)].lexeme)));
-                                                                    if((yyvsp[(3) - (3)].node)!=NULL){addchild((yyval.node),(yyvsp[(3) - (3)].node));}}
+    {(yyval.node)=newnode(Identifier,(yyvsp[(2) - (3)].lexeme));
+                                                                    if((yyvsp[(3) - (3)].node)!=NULL){(yyval.node)=(yyvsp[(3) - (3)].node);;}
+                                                                }
     break;
 
   case 10:
