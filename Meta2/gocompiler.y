@@ -2,6 +2,7 @@
 
 %{
 #include "ast.h"
+#include <stddef.h>
 
 int yylex(void);
 void yyerror(char *);
@@ -123,28 +124,27 @@ parameters2: COMMA IDENTIFIER type parameters2                                 {
     |/*vazio*/                                                                  {$$=NULL;}
     ;
 
-funcbody: LBRACE varsandstatements RBRACE                                       {$$=newnode(FuncBody,NULL);
-                                                                                    if($2!=NULL){addchild($$,$2);}}
+funcbody: LBRACE varsandstatements RBRACE                                       {$$=$2;}
 
     ;
 
 varsandstatements: varsandstatements SEMICOLON                                  {$$=$1;}
     | varsandstatements vardeclaration SEMICOLON                                {
-                                                                                    if($1!=NULL){
-                                                                                        addchild($1,$2);
-                                                                                        $$=$1;
-                                                                                    }else{
-                                                                                        $$=$2;
+                                                                                    if($1==NULL) {
+                                                                                        $$ = newnode(FuncBody, NULL);
+                                                                                    } else {
+                                                                                        $$ = $1;
                                                                                     }
+                                                                                    addchild($$, $2);
                                                                                 }
     | varsandstatements statement SEMICOLON                                     {
-                                                                                    if($1!=NULL){
-                                                                                        addchild($1,$2);
-                                                                                        $$=$1;
-                                                                                    }else{
-                                                                                        $$=$2;
+                                                                                    if($1==NULL) {
+                                                                                        $$ = newnode(FuncBody, NULL);
+                                                                                    } else {
+                                                                                        $$ = $1;
                                                                                     }
-                                                                                }                               
+                                                                                    addchild($$, $2);
+                                                                                }
     | /* vazio*/                                                                {$$=NULL;}
     ;
 
@@ -180,8 +180,14 @@ statement: IDENTIFIER ASSIGN expr                                               
                                                                                     addchild($$,newnode(StrLit,$3));}
     | error                                                                     {$$=NULL;}
 
-statement2: statement2 statement SEMICOLON                                      {$$=$1;
-                                                                                    addchild($$,$2);}
+statement2: statement2 statement SEMICOLON                                      {if ($1 == NULL) {
+                                                                                        $$ = newnode(Block, NULL);
+                                                                                    } else {
+                                                                                        $$ = $1;
+                                                                                    }
+                                                                                    if ($2 != NULL) {
+                                                                                        addchild($$, $2);
+                                                                                    }}
     |/*vazio*/                                                                  {$$=NULL;}
     ;
 
