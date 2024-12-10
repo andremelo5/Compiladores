@@ -2301,32 +2301,32 @@ int main(int argc, char *argv[]){
             flag = 1;
             yylex();
     }
-    else if(argc >= 2 && strcmp(argv[1], "-t") == 0 && errors == 0) { 
+    else if(argc >= 2 && strcmp(argv[1], "-t") == 0) { 
         yyparse();
-        show(program, 0);  
+        if(errors==0){
+            show(program, 0);
+        }  
 
-    }else if(argc >= 2 && strcmp(argv[1], "-s") == 0 && errors == 0) { 
-        
+    }else if(argc >= 2 && strcmp(argv[1], "-s") == 0) { 
         yyparse();
-        errors+=check_program(program,1);
-        //if(errors==0){
+        if(errors==0){
+            errors+=check_program(program,1);
             show_symbol_table(symbol_table);
             show_anotated(program, 0);  
-        //}
-    }else if(argc <= 1 && errors == 0) {
+        }
+    }else if(argc <= 1) {
         yyparse();
-        errors += check_program(program,1);
-        //if(errors == 0){    
-            codegen_program(program,1);
-        //}
+        if(errors==0){
+            errors += check_program(program,1);
+            if(errors == 0){    
+                codegen_program(program,1);
+            }
+        } 
     }else{ 
         yyparse();
-    }
-    if(program!=NULL){
-        //yydebug=1;
-        //deallocate(program);
-        //free_ast(program);
-        
+        if(errors == 0) {
+            errors += check_program(program,1);
+        }
     }
     
     yylex_destroy();

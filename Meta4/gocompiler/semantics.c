@@ -173,7 +173,9 @@ void check_expr(struct node *expr,struct symbol_list *scope){
 
         case Call:
             id=getchild(expr,0); 
-            char lista_types_call[256]="";
+            //char lista_types_call[256]="";
+            char *lista_types_call = (char *)malloc(4096);
+            
 
             //Cria um string com tds o stipos passados no call
             if (getchild(expr,1)!=NULL){ //verifica o primeiro expr
@@ -268,14 +270,12 @@ void check_statements(struct node *statement,struct symbol_list *scope){
             }else{
                 expr=getchild(statement,0);
                 check_expr(expr,scope);
-                if(expr->type==undef){return;}
-                if((expr->type!=bool_type && expr->type!=no_type)){
+                if((expr->type!=bool_type && expr->type!=no_type)|| expr->type==undef){
                     semantic_errors++;
                     printf("Line %d, column %d: Incompatible type %s in for statement\n", expr->token_line, expr->token_column, type_name(expr->type));
                 }
                 check_statements(getchild(statement,1),scope);
             }
-
             break;
 
         case Block:
@@ -293,6 +293,8 @@ void check_statements(struct node *statement,struct symbol_list *scope){
             if (expr!=NULL){
                 check_expr(expr,scope);
                 //verificar se o tipo da expressao e igual ao da funcao
+                //ir ao no da funcao e tirar o type
+                //scope->identifier --> vai buscar o no com este nome e dps a partir dele tiro o tipo
                 if(search_symbol(scope, "return")->type != expr->type){
                     semantic_errors++;
                     printf("Line %d, column %d: Incompatible type %s in return statement\n",statement->token_line, expr->token_column,type_name(expr->type));
@@ -336,7 +338,9 @@ void check_statements(struct node *statement,struct symbol_list *scope){
                     semantic_errors++;
                     printf("Line %d, column %d: Incompatible type undef in fmt.Println statement\n",expr->token_line, expr->token_column);      
                 }
+                statement->is_expr=1;
             }
+            
             break;
 
         default:
@@ -436,7 +440,8 @@ void check_funcDecl(struct node *funcdecl){
 
 
     //verificar o funcParams
-    char string_params[256]="";
+    //char string_params[256]="";
+    char *string_params = (char *)malloc(4096);
     if(type==no_type){ //tive de adicionar isto pq quando nao ha type na funcao o nº do child muda
         check_funcParams(getchild(funcHeader,1),scope,string_params);
     }else{

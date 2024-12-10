@@ -150,14 +150,16 @@ void print_main(){
         struct node *funcHeader = getchild(entry->node,0);
         enum type type = category_type(getchild(funcHeader,1)->category);
 
-        printf("define i32 @main() {\n");
+        //printf("define i32 @main() {\n");
+        printf("define i32 @main(i32 %%argc, i8** %%argv) {\n");
 
         if(type==no_type){//void
             //falta ver para casos em que main tenha parametros de entrada
-            printf("  call void @_main()\n");
+            //printf("  call void @_main()\n");
+            printf("  call void @_main(i32 %%argc, i8** %%argv)\n");
             printf("  ret i32 0\n"); // Retorna 0 como sucesso
         }else{
-            printf("  %%1 = call %s @_main()\n", tipo_codificado(type));
+            printf("  %%1 = call %s @_main(i32 %%argc, i8** %%argv)\n", tipo_codificado(type));
             printf("  ret %s %%1\n",  tipo_codificado(type));
         }
         printf("}\n");
@@ -191,7 +193,13 @@ void codegen_funcDecl(struct node *funcdecl) {
     enum type type = category_type(getchild(funcHeader,1)->category);
     temporary = 1;
     flag_return=0;//nao tem no return
-    printf("define %s @_%s(", tipo_codificado(type), id->token);
+
+    if(strcmp(id->token,"main")==0){
+        printf("define void @_main(i32 %%argc, i8** %%argv");
+    }else{
+        printf("define %s @_%s(", tipo_codificado(type), id->token);
+    }
+    
     if(type==no_type){
         codegen_funcParams(getchild(funcHeader,1));
         printf(") {\n");
@@ -204,10 +212,8 @@ void codegen_funcDecl(struct node *funcdecl) {
         printf(") {\n");
         codegen_funcBody(funcBody);
         if(flag_return==0){
-            printf("  ret %s 0\n", tipo_codificado(type)); 
+            printf("  ret %s %s\n", tipo_codificado(type),tipo_inicial(type)); 
         }
-        //isto esta mal, tenho de usar um temporario e imprimir o valor calculado nele mas para ja fica assim
-        //vou ter de usar o temporary-1 pq sera o ultimo
     }
     printf("}\n\n");
 }
@@ -353,23 +359,31 @@ void codegen_statements(struct node *statement){
         case Call:
             codegen_expr(statement);
             break;
-            /*
         case ParseArgs:
-            //IMPORTANTE: id tem de ser int e expr tem de ser int ou string
             id=getchild(statement,0);
             expr=getchild(statement,1);
-            check_expr(id,scope);
-            check_expr(expr,scope);
-            if((id->type!=int_type)||(expr->type!=int_type && expr->type!=string_type)){
-                if(expr->type==no_type){expr->type=undef;}
-                semantic_errors++;
-                printf("Line %d, column %d: Operator strconv.Atoi cannot be applied to types %s, %s\n",statement->token_line, statement->token_column,type_name(id->type),type_name(expr->type));
+
+            //n preciso de fzr codegen do id
+            int expr_tmp=codegen_expr(expr);
+
+            //valor do CMDARGS
+            int args_tmp = temporary++;
+            printf("  %%%d = getelementptr i8*, i8** %%argv, i32 %%%d\n", args_tmp, expr_tmp);
+            int loaded_arg = temporary++;
+            printf("  %%%d = load i8*, i8** %%%d\n", loaded_arg, args_tmp);
+            
+            
+            //temos de converter para int
+            printf("  %%%d = call i32 @atoi(i8* %%%d)\n", temporary, loaded_arg);
+            
+            //guarda o resultado no id
+            if(search_symbol(symbol_table,id->token)!=NULL){ //global
+                printf("  store i32 %%%d, i32* @%s\n",temporary, id->token);
             }else{
-                statement->type=expr->type;
-                statement->is_expr=1;
+                printf("  store i32 %%%d, i32* %%%s\n",temporary, id->token);
             }
+            temporary++;
             break;
-            */
         case Print:
             expr=getchild(statement,0);
             if (expr->category==StrLit){
@@ -552,7 +566,42 @@ int codegen_plus(struct node *expr) {
 }
 
 int codegen_call(struct node *expr){
-    struct node *id=getchild(expr,0);
+    struct node *id=getchild(expr,0); 
+    struct node *aux = (struct node *) malloc(sizeof(struct node));
+    struct node_list *child = (struct node_list *) malloc(sizeof(struct node_list));
+    struct node *child_node = (struct node *) malloc(sizeof(struct node));
+    char *lista_types_call = (char *)malloc(4096);
+    
+
+    //Cria um string com tds o stipos passados no call
+    if (getchild(expr,1)!=NULL){ //verifica o primeiro expr
+        int tmp=codegen_expr(getchild(expr,1));
+        char *str_aux = (char *)malloc(4096);
+        sprintf(str_aux,"%s %%%d", tipo_codificado(getchild(expr,1)->type), tmp);
+        strcat(lista_types_call, str_aux);
+        if (getchild(expr,2)!=NULL){
+            aux=getchild(expr,2);
+            child = aux->children; //aux pode ter mais do que um filho expr
+            while ((child=child->next) != NULL) {
+                child_node = child->node;
+                int tmp2=codegen_expr(child_node);
+                char *str_aux2 = (char *)malloc(4096);
+                strcat(lista_types_call, ",");
+                sprintf(str_aux2,"%s %%%d", tipo_codificado(child_node->type), tmp2);
+                strcat(lista_types_call, str_aux2);
+            }
+        }
+    }
+
+    if(search_symbol(symbol_table,id->token)->type==no_type){ //funcao do tipo void
+        printf("  call %s @_%s(%s)\n",tipo_codificado(search_symbol(symbol_table,id->token)->type), id->token, lista_types_call);
+    }else{
+        printf("  %%%d = call %s @_%s(%s)\n",temporary, tipo_codificado(search_symbol(symbol_table,id->token)->type), id->token, lista_types_call);
+    }
+
+
+
+    return temporary++;
 }
 
 
