@@ -7,7 +7,7 @@
 
 declare i32 @atoi(i8*)
 declare i32 @printf(i8*, ...)
-@logic_result = global i1 false
+@true_or_false = global i1 false
 
 
 

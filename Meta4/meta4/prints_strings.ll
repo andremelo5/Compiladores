@@ -7,22 +7,22 @@
 
 declare i32 @atoi(i8*)
 declare i32 @printf(i8*, ...)
-@logic_result = global i1 false
+@true_or_false = global i1 false
 
 
 
 @b = global i1 0
 @a = global i32 0
 define void @_main(i32 %argc, i8** %argv) {
-@a = global i32 0
+  %a = alloca i32
   %f = alloca double
   %1 = add i32 10, 0
-  store i32 %1, i32* @a
+  store i32 %1, i32* %a
   %2 = fadd double 10.12332, 0.0
   store double %2, double* %f
   %3 = load double, double* %f
   call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([7 x i8], [7 x i8]* @.str_float, i32 0, i32 0), double %3)
-  %5 = load i32, i32* @a
+  %5 = load i32, i32* %a
   call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([4 x i8], [4 x i8]* @.str_int, i32 0, i32 0), i32 %5)
   %7 = fadd double 1.000003, 0.0
   call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([7 x i8], [7 x i8]* @.str_float, i32 0, i32 0), double %7)

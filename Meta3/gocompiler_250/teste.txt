@@ -1,0 +1,7 @@
+package main;
+
+func factorial(n float32) {
+    var a int;
+    if(n+a) {};
+};
+

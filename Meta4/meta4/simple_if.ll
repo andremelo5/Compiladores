@@ -7,7 +7,7 @@
 
 declare i32 @atoi(i8*)
 declare i32 @printf(i8*, ...)
-@logic_result = global i1 false
+@true_or_false = global i1 false
 
 
 
@@ -54,7 +54,7 @@ L16then:
   call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([4 x i8], [4 x i8]* @.str_string, i32 0, i32 0), i8* %ptr22)
   %23 = alloca i32
   %24 = fadd double 11.012, 0.0
-  %25 = fadd double 2e3, 0.0
+  %25 = fadd double 2.e3, 0.0
   %26 = fcmp olt double %24, %25
   %27 = icmp ne i1 %26, 0
   br i1 %27, label %L23then, label %L23else
